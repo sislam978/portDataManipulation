@@ -1,0 +1,182 @@
+PortSummaryTable [port_name=DBH, ticker=ACI, share_quantity=-2500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=ACMELAB, share_quantity=157500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=ACTIVEFINE, share_quantity=3000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=AIBL1STIMF, share_quantity=5856300.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=ASIAPACINS, share_quantity=-1450.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BANKASIA, share_quantity=-40000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BATASHOE, share_quantity=78140.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BATBC, share_quantity=28636.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BDBLUF, share_quantity=100000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BDFINANCE, share_quantity=1000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BENGALWTL, share_quantity=29400.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BERGERPBL, share_quantity=17000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BEXIMCO, share_quantity=17100.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BRACBANK, share_quantity=-50000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BSRMSTEEL, share_quantity=50153.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=BXPHARMA, share_quantity=531376.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=CAPMUF, share_quantity=60000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=CENTRALINS, share_quantity=1600.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=CITYBANK, share_quantity=3618213.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=CONFIDCEM, share_quantity=212610.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=DACCADYE, share_quantity=-15000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=DAFODILCOM, share_quantity=11000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=DESCO, share_quantity=293847.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=EBL, share_quantity=1170490.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=4.8926482E7, current_price=42.0]
+
+PortSummaryTable [port_name=DBH, ticker=EHL, share_quantity=800.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=ENERGYPRIMA, share_quantity=626000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=FUWANGCER, share_quantity=500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=GBBPOWER, share_quantity=75000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=GP, share_quantity=381222.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=HEIDELBCEM, share_quantity=45148.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=IDLCBF, share_quantity=700000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=IFADAUTOS, share_quantity=50000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=IPDC, share_quantity=-500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=ISLAMIBANK, share_quantity=50000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=ISLAMICFIN, share_quantity=500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=JAMUNABANK, share_quantity=214.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=JAMUNAOIL, share_quantity=-4910.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=KDSALTD, share_quantity=15000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=KEYACOSMET, share_quantity=-7284.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=KPCL, share_quantity=-37475.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=LANKABAFIN, share_quantity=-2000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=LANKASECURITIES, share_quantity=146742.75, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=LEGACYFOOT, share_quantity=4500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=LHBL, share_quantity=490000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=LRGLOBMF1, share_quantity=4367862.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=MAKSONSPIN, share_quantity=40000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=MALEKSPIN, share_quantity=30000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=MARICO, share_quantity=-4350.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=MBL1STMF, share_quantity=1456500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=MEGHNACEM, share_quantity=-2000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=METROSPIN, share_quantity=-9500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=MICEMENT, share_quantity=-30000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=MPETROLEUM, share_quantity=-12500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=NAHEEACP, share_quantity=4623.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=NCCBLMF1, share_quantity=-74500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=NITOLINS, share_quantity=500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=NORTHRNINS, share_quantity=152.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=OIMEX, share_quantity=12438.5, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=OLYMPIC, share_quantity=-15040.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=PADMAOIL, share_quantity=-5000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=PHOENIXFIN, share_quantity=202.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=PREMIERCEM, share_quantity=30595.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=PSBCUF1, share_quantity=299400.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=PTL, share_quantity=250.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=PUBALIBANK, share_quantity=10950.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=QSMDRYCELL, share_quantity=2000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=QUEENSOUTH, share_quantity=13772.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=RENATA, share_quantity=76074.6, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=RNSPIN, share_quantity=68000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=RUPALILIFE, share_quantity=1000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SAIHAMTEX, share_quantity=-1700.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SALAMCRST, share_quantity=5000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SAPORTL, share_quantity=70062.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SEBL1STMF, share_quantity=1500000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SHAHJABANK, share_quantity=50037.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SHURWID, share_quantity=-46500.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SINGERBD, share_quantity=-190.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SQUARETEXT, share_quantity=166061.7, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SQURPHARMA, share_quantity=526876.05, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=SUMITPOWER, share_quantity=21200.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=TAKAFULINS, share_quantity=237.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=TITASGAS, share_quantity=-30000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=TRUSTBANK, share_quantity=-100000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=TRUSTBANKBOND, share_quantity=2.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=UCB, share_quantity=51000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=UNICORN, share_quantity=110000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=UNIONCAP, share_quantity=-280000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=UNIQUEHRL, share_quantity=-590000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=UNITEDAIR, share_quantity=34.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=UNITEDINS, share_quantity=30.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+
+PortSummaryTable [port_name=DBH, ticker=VIPBUF, share_quantity=1100000.0, cost_price=250.48, source_date=2018-04-02, portfoli_value=0.0, current_price=0.0]
+

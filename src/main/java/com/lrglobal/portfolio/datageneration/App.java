@@ -60,6 +60,12 @@ public class App
     			portmanager.Insert();
     			portmanager.exit();
     		}
+    		else if(command.equalsIgnoreCase("export")){
+    			PortSummaryTableManager portmanager=new PortSummaryTableManager();
+    			portmanager.setup();
+    			portmanager.exportData();
+    			portmanager.exit();
+    		}
     	}
 //        TestTableManager testTableManager=new TestTableManager();
 //        testTableManager.setup();

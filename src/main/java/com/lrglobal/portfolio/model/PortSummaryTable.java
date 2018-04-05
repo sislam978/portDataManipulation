@@ -11,8 +11,6 @@ import javax.persistence.Table;
 
 
 
-
-
 @NamedNativeQueries({
 
 	@NamedNativeQuery(
@@ -27,6 +25,18 @@ import javax.persistence.Table;
 			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
 			resultClass=PortFolio.class
 			),
+	@NamedNativeQuery(
+			name="getCurrentPrice",
+			query ="CALL getCurrentPrice(:q_tickerName,:q_date)",
+			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+			resultClass=PortFolio.class
+			),
+	@NamedNativeQuery(
+			name="getAllFromProvidedRangeForCostPrice",
+			query ="CALL getAllFromProvidedRangeForCostPrice(:q_ticker,:q_startdate,:q_enddate)",
+			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+			resultClass=PortFolio.class
+			)
 })
 @Entity
 @Table(name="portfolio_summary_table")
@@ -178,18 +188,9 @@ public class PortSummaryTable {
 
 	@Override
 	public String toString() {
-		return "PortSummaryTable [port_id=" + port_id + ", port_name=" + port_name + ", ticker=" + ticker
-				+ ", share_quantity=" + share_quantity + ", cost_price=" + cost_price + ", source_date=" + source_date
-				+ ", portfoli_value=" + portfoli_value + ", weightInPortfolio=" + weightInPortfolio + ", current_price="
-				+ current_price + ", created_by=" + created_by + ", created_on=" + created_on + ", deleted_by="
-				+ deleted_by + ", deleted_on=" + deleted_on + ", getPort_id()=" + getPort_id() + ", getPort_name()="
-				+ getPort_name() + ", getTicker()=" + getTicker() + ", getShare_quantity()=" + getShare_quantity()
-				+ ", getCost_price()=" + getCost_price() + ", getSource_date()=" + getSource_date()
-				+ ", getPortfoli_value()=" + getPortfoli_value() + ", getWeightInPortfolio()=" + getWeightInPortfolio()
-				+ ", getCurrent_price()=" + getCurrent_price() + ", getCreated_by()=" + getCreated_by()
-				+ ", getCreated_on()=" + getCreated_on() + ", getDeleted_by()=" + getDeleted_by() + ", getDeleted_on()="
-				+ getDeleted_on() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-				+ super.toString() + "]";
+		return "PortSummaryTable [port_name=" + port_name + ", ticker=" + ticker + ", share_quantity=" + share_quantity
+				+ ", cost_price=" + cost_price + ", source_date=" + source_date + ", portfoli_value=" + portfoli_value
+				+ ", current_price=" + current_price + "]";
 	}
 	
 	
