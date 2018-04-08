@@ -17,6 +17,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.Query;
 
+import com.lrglobal.portfolio.Service.PortFolioService;
 import com.lrglobal.portfolio.datageneration.ReadPortFolioDatafromCSV;
 
 public class PortSummaryTableManager {
@@ -64,9 +65,6 @@ public class PortSummaryTableManager {
 			} else {
 				if (rslt.get(j).getSign().equals("BUY")) {
 					tickermap.put(rslt.get(j).getTicker(), rslt.get(j).getNumber_of_share());
-				} else {
-					double v1 = 0 - rslt.get(j).getNumber_of_share();
-					tickermap.put(rslt.get(j).getTicker(), v1);
 				}
 			}
 		}
@@ -233,6 +231,22 @@ public class PortSummaryTableManager {
 		session.close();
 	}
 
+	public ArrayList<PortSummaryTable> getSingledata(String portName,String ticker, String d_date){
+		 ArrayList<PortSummaryTable> rslt=new ArrayList<PortSummaryTable>();
+		 Session session=sessionFactory.openSession();
+		 session.beginTransaction();
+		 
+		 Query query= session.getNamedQuery("getDesiredDateData")
+				 .setParameter("q_portName", portName)
+				 .setParameter("q_ticker", ticker)
+				 .setParameter("q_date", d_date);
+		 
+		 rslt=(ArrayList<PortSummaryTable>)query.getResultList();
+		 System.out.println(rslt.size());
+		 session.getTransaction().commit();
+		 session.close();
+		 return rslt;
+	}
 	public void delete() {
 		// code to remove a Data
 		Session session = sessionFactory.openSession();

@@ -39,6 +39,8 @@ public class App
 	}
     public static void main( String[] args )
     {
+//    	App a=new App();
+//    	a.dateFormation("1/10/2018");
     	
     	Scanner input=new Scanner(System.in);
     	System.out.println("Enter the command instruction: ");

@@ -52,7 +52,7 @@ public class PortFolioManager {
     	
     	ReadPortFolioDatafromCSV readPortFolioDatafromCSV=new ReadPortFolioDatafromCSV();
     	ArrayList<PortFolio> rslt=readPortFolioDatafromCSV.getAllData(fileName);
-    	Collections.sort(rslt,PortFolio.sortingdata);
+    	//Collections.sort(rslt,PortFolio.sortingdata);
     	
     	for(int i=0;i<rslt.size();i++){
     		PortFolio pp=rslt.get(i);
@@ -68,10 +68,32 @@ public class PortFolioManager {
     		 * thats why inside the condition we just skip the insertion and also the amount of data which are duplicate by extracting the
     		 * size of the data */
     		if(list.size()>0){
-    			i=i+list.size()-1;
-    			continue;
+    			PortFolio finalPort=new PortFolio();
+    			if(list.get(0).getNumber_of_share()!=null && rslt.get(i).getNumber_of_share()!=null)
+    			{
+    				double quantity=list.get(0).getNumber_of_share()+rslt.get(i).getNumber_of_share();
+    				if(list.get(0).getCost_price()!=null && rslt.get(i).getCost_price()!=null){
+    					double weightedsum=list.get(0).getNumber_of_share()*list.get(0).getCost_price()
+            					+rslt.get(i).getNumber_of_share()*rslt.get(i).getCost_price();
+    					double avgCostPrice=weightedsum/quantity;
+    					list.get(0).setCost_price(avgCostPrice);
+    				}
+        			list.get(0).setNumber_of_share(quantity);
+        			session.saveOrUpdate(list.get(0));
+    			}
+    			else if(rslt.get(i).getNumber_of_share()!=null){
+    				list.get(0).setCost_price(rslt.get(i).getCost_price());
+        			list.get(0).setNumber_of_share(rslt.get(i).getNumber_of_share());
+        			session.saveOrUpdate(list.get(0));
+    			}
+    			
+    			//i=i+list.size();
+    			//continue;
     		}
-    		session.save(pp);
+    		else{
+    			session.save(pp);
+    		}
+    		
     		if(i%250==0){
     			session.flush();
     			session.clear();

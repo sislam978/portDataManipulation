@@ -36,6 +36,12 @@ import javax.persistence.Table;
 			query ="CALL getAllFromProvidedRangeForCostPrice(:q_ticker,:q_startdate,:q_enddate)",
 			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
 			resultClass=PortFolio.class
+			),
+	@NamedNativeQuery(
+			name="getDesiredDateData",
+			query ="CALL getDesiredDateData(:q_portName,:q_ticker,:q_date)",
+			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+			resultClass=PortSummaryTable.class
 			)
 })
 @Entity
