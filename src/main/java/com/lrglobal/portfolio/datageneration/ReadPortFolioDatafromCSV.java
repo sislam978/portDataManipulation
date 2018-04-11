@@ -45,12 +45,12 @@ public class ReadPortFolioDatafromCSV {
 				else{
 					portFolio.setTicker(csvRecord.get(0).toString());
 				}
-				if(csvRecord.get(1).toString().equals("")){
-					portFolio.setSector(null);
-				}
-				else{
-					portFolio.setSector(csvRecord.get(1).toString());
-				}
+//				if(csvRecord.get(1).toString().equals("")){
+//					portFolio.setSector(null);
+//				}
+//				else{
+//					portFolio.setSector(csvRecord.get(1).toString());
+//				}
 				if(csvRecord.get(2).toString().equals("")){
 					portFolio.setNumber_of_share(null);
 				}

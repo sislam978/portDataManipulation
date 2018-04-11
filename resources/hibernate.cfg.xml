@@ -29,5 +29,10 @@
       <mapping class="com.lrglobal.portfolio.model.PortFolio"/>
       <mapping class="com.lrglobal.portfolio.model.PortSummaryTable"/>
       
+      <mapping class="com.lrglobal.portfolio.model.PortfolioValue"/>
+      <mapping class="com.lrglobal.portfolio.model.PriceTable"/>
+      <mapping class="com.lrglobal.portfolio.model.TickerTable"/>
+      
+      
   </session-factory>
 </hibernate-configuration>

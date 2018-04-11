@@ -33,7 +33,7 @@ import javax.persistence.Table;
 			),
 	@NamedNativeQuery(
 			name="getAllFromProvidedRangeForCostPrice",
-			query ="CALL getAllFromProvidedRangeForCostPrice(:q_ticker,:q_startdate,:q_enddate)",
+			query ="CALL getAllFromProvidedRangeForCostPrice(:q_tickerName,:q_startdate,:q_enddate,:q_portName)",
 			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
 			resultClass=PortFolio.class
 			),

@@ -58,8 +58,8 @@ public class PortFolio {
 	@Column(name="price_change")
 	private Double price_change;
 	
-	@Column(name="WeightInPortfolio")
-	private Double weight_in_portfolio;
+//	@Column(name="WeightInPortfolio")
+//	private Double weight_in_portfolio;
 	
 	@Column(name="created_by")
 	private Integer created_by;
@@ -73,8 +73,8 @@ public class PortFolio {
 	@Column(name="deleted_on")
 	private String deleted_on;
 	
-	@Column(name="Sector")
-	private String sector;
+//	@Column(name="Sector")
+//	private String sector;
 
 	public long getPortfolio_id() {
 		return portfolio_id;
@@ -172,13 +172,13 @@ public class PortFolio {
 		this.price_change = price_change;
 	}
 
-	public Double getWeight_in_portfolio() {
-		return weight_in_portfolio;
-	}
-
-	public void setWeight_in_portfolio(Double weight_in_portfolio) {
-		this.weight_in_portfolio = weight_in_portfolio;
-	}
+//	public Double getWeight_in_portfolio() {
+//		return weight_in_portfolio;
+//	}
+//
+//	public void setWeight_in_portfolio(Double weight_in_portfolio) {
+//		this.weight_in_portfolio = weight_in_portfolio;
+//	}
 
 	public Integer getCreated_by() {
 		return created_by;
@@ -214,13 +214,13 @@ public class PortFolio {
 	
 	
 
-	public String getSector() {
-		return sector;
-	}
-
-	public void setSector(String sector) {
-		this.sector = sector;
-	}
+//	public String getSector() {
+//		return sector;
+//	}
+//
+//	public void setSector(String sector) {
+//		this.sector = sector;
+//	}
 	
 
 	public static Comparator<PortFolio> sortingdata = new Comparator<PortFolio>() {
@@ -241,18 +241,16 @@ public class PortFolio {
 				+ ", number_of_share=" + number_of_share + ", cost_price=" + cost_price + ", current_price="
 				+ current_price + ", prev_price=" + prev_price + ", sign=" + sign + ", commission=" + commission
 				+ ", source_date=" + source_date + ", portfolio_value=" + portfolio_value + ", price_change="
-				+ price_change + ", weight_in_portfolio=" + weight_in_portfolio + ", created_by=" + created_by
-				+ ", created_on=" + created_on + ", deleted_by=" + deleted_by + ", deleted_on=" + deleted_on
-				+ ", sector=" + sector + ", getPortfolio_id()=" + getPortfolio_id() + ", getPortfoli_name()="
-				+ getPortfoli_name() + ", getTicker()=" + getTicker() + ", getNumber_of_share()=" + getNumber_of_share()
-				+ ", getCost_price()=" + getCost_price() + ", getCurrent_price()=" + getCurrent_price()
-				+ ", getPrev_price()=" + getPrev_price() + ", getSign()=" + getSign() + ", getCommission()="
-				+ getCommission() + ", getSource_date()=" + getSource_date() + ", getPortfolio_value()="
-				+ getPortfolio_value() + ", getprice_change()=" + getprice_change() + ", getWeight_in_portfolio()="
-				+ getWeight_in_portfolio() + ", getCreated_by()=" + getCreated_by() + ", getCreated_on()="
-				+ getCreated_on() + ", getDeleted_by()=" + getDeleted_by() + ", getDeleted_on()=" + getDeleted_on()
-				+ ", getSector()=" + getSector() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
-				+ ", toString()=" + super.toString() + "]";
+				+ price_change + ", created_by=" + created_by + ", created_on=" + created_on + ", deleted_by="
+				+ deleted_by + ", deleted_on=" + deleted_on + ", getPortfolio_id()=" + getPortfolio_id()
+				+ ", getPortfoli_name()=" + getPortfoli_name() + ", getTicker()=" + getTicker()
+				+ ", getNumber_of_share()=" + getNumber_of_share() + ", getCost_price()=" + getCost_price()
+				+ ", getCurrent_price()=" + getCurrent_price() + ", getPrev_price()=" + getPrev_price() + ", getSign()="
+				+ getSign() + ", getCommission()=" + getCommission() + ", getSource_date()=" + getSource_date()
+				+ ", getPortfolio_value()=" + getPortfolio_value() + ", getprice_change()=" + getprice_change()
+				+ ", getCreated_by()=" + getCreated_by() + ", getCreated_on()=" + getCreated_on() + ", getDeleted_by()="
+				+ getDeleted_by() + ", getDeleted_on()=" + getDeleted_on() + ", getClass()=" + getClass()
+				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
 	}
 	
 	
