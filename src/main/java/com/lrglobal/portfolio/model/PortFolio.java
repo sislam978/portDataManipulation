@@ -1,5 +1,6 @@
 package com.lrglobal.portfolio.model;
 
+import java.io.IOException;
 import java.util.Comparator;
 
 import javax.persistence.Column;
@@ -10,7 +11,19 @@ import javax.persistence.Id;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.Table;
+import javax.ws.rs.WebApplicationException;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
+
+@NamedNativeQueries({
+	@NamedNativeQuery(
+			name="getAllOndatePortfolio",
+			query="CALL getAllOndatePortfolio(:q_portName,:q_date)",
+			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+			resultClass=PortFolio.class
+			)
+})
 
 @Entity
 @Table(name="portfolio_table")
@@ -234,6 +247,28 @@ public class PortFolio {
 
     }};
 
+    /*
+     * for providing some special string format that we need to pack our obvjects into 
+     * and then implement either a constructor taking a string, a static valueOf(String s) 
+     * or static fromString(string s in the class that will take this string and create 
+     * an object from it. Or quite similia, create a paramterhandler that does exactly the same. 
+     * 
+     *  Example:-
+     *  
+     *  A URI http://my-server.com/myService?a={"foo":1, "bar":2}&a={"foo":100, "bar":200} would in 
+     *  this case be deserialized into an array composed of two MyClass objects.
+     */
+    
+    public static PortFolio fromString(String jsonRepresentation) {
+        ObjectMapper mapper = new ObjectMapper(); //Jackson's JSON marshaller
+        PortFolio portRecord= null;
+        try {
+        	portRecord = (PortFolio) mapper.readValue(jsonRepresentation, PortFolio.class );
+        } catch (IOException e) {
+                 throw new WebApplicationException();
+        }
+        return portRecord;
+}
 
 	@Override
 	public String toString() {

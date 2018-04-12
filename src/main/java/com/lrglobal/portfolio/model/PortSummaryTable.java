@@ -42,6 +42,12 @@ import javax.persistence.Table;
 			query ="CALL getDesiredDateData(:q_portName,:q_ticker,:q_date)",
 			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
 			resultClass=PortSummaryTable.class
+			),
+	@NamedNativeQuery(
+			name="getEachPortInfo",
+			query ="CALL getEachPortInfo(:q_portName,:q_date)",
+			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+			resultClass=PortSummaryTable.class
 			)
 })
 @Entity

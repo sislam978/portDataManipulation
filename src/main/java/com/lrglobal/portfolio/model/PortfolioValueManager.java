@@ -90,6 +90,23 @@ public class PortfolioValueManager {
 		session.getTransaction().commit();
 		session.close();
 	}
+	
+	public ArrayList<PortfolioValue> getSinglePortValueData(String portName, String d_date){
+		Session session =sessionFactory.openSession();
+		session.beginTransaction();
+		
+		ArrayList<PortfolioValue>rslt=new ArrayList<PortfolioValue>();
+		
+		String SQL_QUERY=  "select u from PortfolioValue u where u.portName='" + portName + "' and u.source_date='"
+				+ d_date + "'";
+		Query query= session.createQuery(SQL_QUERY);
+		rslt=(ArrayList<PortfolioValue>) query.getResultList();
+		
+		session.getTransaction().commit();
+		session.close();
+		
+		return rslt;
+	}
 
 	public void read() {
 		// code to get a Data

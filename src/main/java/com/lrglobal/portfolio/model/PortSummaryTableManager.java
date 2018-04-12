@@ -333,6 +333,22 @@ public class PortSummaryTableManager {
 		session.close();
 	}
 
+	
+	public ArrayList<PortSummaryTable> getEachPortData(String port_name,String d_date){
+		Session session=sessionFactory.openSession();
+		session.beginTransaction();
+		
+		
+		Query query = session.getNamedQuery("getEachPortInfo").setParameter("q_portName", port_name)
+				.setParameter("q_date", d_date);
+
+		ArrayList<PortSummaryTable> rslt = (ArrayList<PortSummaryTable>) query.getResultList();
+		System.out.println(rslt.size());
+
+		session.getTransaction().commit();
+		session.close();
+		return rslt;
+	}
 	public void exportData() {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();

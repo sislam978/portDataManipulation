@@ -115,6 +115,13 @@ public class App
     			priceTableManager.updateRowPriceChange();
     			priceTableManager.exit();
     		}
+    		//CASH ticker row insert in portfolio table
+    		else if(command.equalsIgnoreCase("cipft")){
+    			PortFolioManager portFolioManager=new PortFolioManager();
+    			portFolioManager.setup();
+    			portFolioManager.cashrow_insert();
+    			portFolioManager.exit();
+    		}
     	}
 //        TestTableManager testTableManager=new TestTableManager();
 //        testTableManager.setup();

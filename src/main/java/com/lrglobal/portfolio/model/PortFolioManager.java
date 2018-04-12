@@ -3,6 +3,7 @@ package com.lrglobal.portfolio.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -19,7 +20,12 @@ import com.lrglobal.portfolio.datageneration.ReadPortFolioDatafromCSV;
 
 public class PortFolioManager {
 	
-
+	public static final double Cashcost_price=1;
+	public static final double Cashcurrent_price=1;
+	public static final String buy="BUY";
+	public static final String sell="SELL";
+	public static final String cashTicker="CASH";
+	
 	public SessionFactory sessionFactory;
 	// connection initialization. dont bother much. this connection process will need in every database transaction
 	// no need to change it either
@@ -120,8 +126,75 @@ public class PortFolioManager {
     	session.getTransaction().commit();
     	session.close();
     }
- 
-    public void update() {
+    //inserting new record in portfolio table with introducing CASH ticker
+    public void cashrow_insert(){
+    	
+    	Session session =sessionFactory.openSession();
+    	session.beginTransaction();
+    	
+    	Scanner scanner=new Scanner(System.in);
+    	System.out.println("Enter portfolio name:");
+    	String port_name=scanner.nextLine();
+    	System.out.println("Enter the desired date:");
+    	String d_date=scanner.nextLine();
+
+    	Query query=session.getNamedQuery("getAllOndatePortfolio")
+    			.setParameter("q_portName",port_name)
+    			.setParameter("q_date", d_date);
+    	
+    	ArrayList<PortFolio> rslt=(ArrayList<PortFolio>) query.getResultList();
+    	PortFolio portFolio=new PortFolio();
+    	double cash_NumShare=calculateShare(rslt);
+    	
+    	if(cash_NumShare>0){
+    		portFolio.setSign(buy);
+    		portFolio.setNumber_of_share(cash_NumShare);
+    	}
+    	else{
+    		portFolio.setSign(sell);
+    		cash_NumShare=0-cash_NumShare;
+    		portFolio.setNumber_of_share(cash_NumShare);
+    	}
+    	portFolio.setCurrent_price(Cashcurrent_price);
+    	portFolio.setCost_price(Cashcost_price);
+    	portFolio.setTicker(cashTicker);
+    	portFolio.setPortfoli_name(port_name);
+    	portFolio.setSource_date(d_date);
+    	
+    	session.save(portFolio);
+    	
+    	session.getTransaction().commit();
+    	session.close();
+    	
+    }
+ // calculating the cash weight value in the method
+    private double calculateShare(ArrayList<PortFolio> rslt) {
+		// TODO Auto-generated method stub
+    	//double share_quantity=0;
+    	double weighted_sum=0;
+    	for(int i=0;i<rslt.size();i++){
+    		if(rslt.get(i).getSign().equals(buy)){
+    			weighted_sum += (rslt.get(i).getCost_price()*rslt.get(i).getNumber_of_share());
+    		}
+    		else{
+    			weighted_sum-= (rslt.get(i).getCost_price()*rslt.get(i).getNumber_of_share());
+    		}
+    	}
+		return weighted_sum;
+	}
+
+    public void insertRecordsApi(PortFolio rslt){
+    	Session session =  sessionFactory.openSession();
+    	session.beginTransaction();
+    	
+    	
+    	session.save(rslt);
+    	
+    	session.getTransaction().commit();
+    	session.close();
+    }
+
+	public void update() {
         // code to modify a Data
     	Session session = sessionFactory.openSession();
     	session.beginTransaction();
