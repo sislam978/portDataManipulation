@@ -22,6 +22,12 @@ import org.codehaus.jackson.map.ObjectMapper;
 			query="CALL getAllOndatePortfolio(:q_portName,:q_date)",
 			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
 			resultClass=PortFolio.class
+			),
+	@NamedNativeQuery(
+			name="getDistinctDate",
+			query="CALL getDistinctDate()",
+			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+			resultClass=PortFolio.class
 			)
 })
 

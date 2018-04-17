@@ -106,20 +106,15 @@ public class PortSummaryTableManager {
 		return last_costprice;
 	}
 
-	public void Insert() throws SQLException, ParseException {
-		// code to save a Data
-		// Before that I have to Read an excel file and take the inputs from the
-		// csvfile.
+	// method for bulk insert for all ports at a time
+	public void Insert(String startdate, String enddate) throws SQLException, ParseException {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		Scanner inScanner = new Scanner(System.in);
+
 		Query query = session.getNamedQuery("getAllPortName");
 		ArrayList<PortFolio> portname = (ArrayList<PortFolio>) query.getResultList();
 
-		System.out.println("Take startdate with yyyy-MM-dd format:");
-		String startdate = inScanner.nextLine();
-		System.out.println("Take enddate with yyyy-MM-dd format:");
-		String enddate = inScanner.nextLine();
+		// format the dates for calendar doing for loop
 		SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
 		Date dateStart = input_format.parse(startdate);
 		Date EndDate = input_format.parse(enddate);
@@ -140,8 +135,11 @@ public class PortSummaryTableManager {
 						.setParameter("q_startdate", startdate).setParameter("q_enddate", UptoendDate);
 				ArrayList<PortFolio> rslt = (ArrayList<PortFolio>) queryPort.getResultList();
 
-				System.out.println("size array : " + rslt.size());
+				System.out.println("size array of query for certain port: " + rslt.size());
 				Map<String, Double> tickermap = new HashMap<String, Double>();
+				/*
+				 * calculating weighted sum of quantity an dmaping with ticker
+				 */
 				tickermap = gettickerValuesForSinglePort(tickermap, rslt);
 				System.out.println("size tickerMap : " + tickermap.size());
 				/*
@@ -155,66 +153,15 @@ public class PortSummaryTableManager {
 				 * calculate the cost price
 				 */
 				Map<String, Double> MapCostPrice = new HashMap<String, Double>();
-
-				for (Map.Entry<String, Double> entry : tickermap.entrySet()) {
-
-					String ticker = entry.getKey();
-					String portName = portname.get(i).getPortfoli_name();
-					Query queryCostPrice = session.getNamedQuery("getAllFromProvidedRangeForCostPrice")
-							.setParameter("q_tickerName", ticker).setParameter("q_startdate", startdate)
-							.setParameter("q_enddate", UptoendDate).setParameter("q_portName", portName);
-					ArrayList<PortFolio> rsltCost = (ArrayList<PortFolio>) queryCostPrice.getResultList();
-
-					System.out.println("array size for cost price data from port table: " + rsltCost.size());
-					double cost_price = getCostpriceSinglePort(rsltCost);
-					if (!MapCostPrice.containsKey(entry.getKey())) {
-						MapCostPrice.put(entry.getKey(), cost_price);
-					}
-				}
+				String portName = portname.get(i).getPortfoli_name();
+				MapCostPrice = calculateCostprice(tickermap, startdate, UptoendDate, portName);
 
 				/*
 				 * get current price and calculate portfolio_value
 				 */
-				for (Map.Entry<String, Double> entry : tickermap.entrySet()) {
-					System.out.println(entry.getKey() + "/" + entry.getValue());
-					// Query query_currentprice =
-					// session.getNamedQuery("getCurrentPrice")
-					// .setParameter("q_tickerName",
-					// entry.getKey()).setParameter("q_date", enddate);
+				MapCurrentPrice = calculateCurrentprice(tickermap, UptoendDate);
+				MapportfolioValue = calculatePorfolioValue(MapCurrentPrice, MapCostPrice,tickermap);
 
-					String SQL_QUERY = "select u from PriceTable u where u.ticker='" + entry.getKey()
-							+ "' and u.price_date='" + UptoendDate + "'";
-					Query currentpriceQuery = session.createQuery(SQL_QUERY);
-					// current price row
-					ArrayList<PriceTable> singleResult = (ArrayList<PriceTable>) currentpriceQuery.getResultList();
-					// ResultSet rs=(ResultSet) query.getResultList();
-					// String s=rs.getString(1);
-					double current_price = 0.0;
-					if (singleResult.size() > 0) {
-						current_price = singleResult.get(0).getPrice();
-					}
-
-					// seting current price column data in port summary table
-					if (!MapCurrentPrice.containsKey(entry.getKey())) {
-						MapCurrentPrice.put(entry.getKey(), current_price);
-					}
-					/*
-					 * calculate portfolio value and insert into the ticker port
-					 * value map
-					 */
-					if (current_price == 0) {
-						double port_value = MapCostPrice.get(entry.getKey()) * entry.getValue();
-						if (!MapportfolioValue.containsKey(entry.getKey())) {
-							MapportfolioValue.put(entry.getKey(), port_value);
-						}
-					} else {
-						double portvalue = current_price * entry.getValue();
-						if (!MapportfolioValue.containsKey(entry.getKey())) {
-							MapportfolioValue.put(entry.getKey(), portvalue);
-						}
-					}
-
-				}
 				/*
 				 * This is the insertion code for port summary table;
 				 */
@@ -238,31 +185,97 @@ public class PortSummaryTableManager {
 		session.close();
 	}
 
-	public void read() {
-		// code to get a Data
+	/*
+	 * creating map for portfolio value and calculation
+	 */
+	private Map<String, Double> calculatePorfolioValue(Map<String, Double> mapCurrentPrice,
+			Map<String, Double> MapCostPrice,Map<String, Double> tickerMap) {
+		// TODO Auto-generated method stub
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
+		Map<String, Double> MapportfolioValue = new HashMap<String, Double>();
+		for (Map.Entry<String, Double> entry : mapCurrentPrice.entrySet()) {
+			System.out.println(entry.getKey() + "/" + entry.getValue());
+
+			if (entry.getValue() == 0) {
+				double port_value = MapCostPrice.get(entry.getKey()) * tickerMap.get(entry.getKey());
+				if (!MapportfolioValue.containsKey(entry.getKey())) {
+					MapportfolioValue.put(entry.getKey(), port_value);
+				}
+			} else {
+				double portvalue = entry.getValue() * tickerMap.get(entry.getKey());
+				if (!MapportfolioValue.containsKey(entry.getKey())) {
+					MapportfolioValue.put(entry.getKey(), portvalue);
+				}
+			}
+
+		}
 		session.getTransaction().commit();
 		session.close();
+		return MapportfolioValue;
 	}
 
-	public void addNetSell() {
+	/*
+	 * current price calculation and maping according to ticker
+	 */
+	private Map<String, Double> calculateCurrentprice(Map<String, Double> tickermap, String uptoendDate) {
+		// TODO Auto-generated method stub
+
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
+		Map<String, Double> MapCurrentPrice = new HashMap<String, Double>();
+		for (Map.Entry<String, Double> entry : tickermap.entrySet()) {
+			System.out.println(entry.getKey() + "/" + entry.getValue());
 
+			Query currentpriceQuery = session.getNamedQuery("getCurrentpriceFromPriceTable")
+					.setParameter("q_tickerName", entry.getKey()).setParameter("q_date", uptoendDate);
+			// current price row
+			ArrayList<PriceTable> singleResult = (ArrayList<PriceTable>) currentpriceQuery.getResultList();
+			double current_price = 0.0;
+			if (singleResult.size() > 0) {
+				current_price = singleResult.get(0).getPrice();
+			}
+
+			// seting current price column data in port summary table
+			if (!MapCurrentPrice.containsKey(entry.getKey())) {
+				MapCurrentPrice.put(entry.getKey(), current_price);
+			}
+		}
 		session.getTransaction().commit();
 		session.close();
+		return MapCurrentPrice;
 	}
 
-	public void update() {
-		// code to modify a Data
+	/*
+	 * calculating cost price for certain date range
+	 */
+	private Map<String, Double> calculateCostprice(Map<String, Double> tickermap, String startdate, String uptoendDate,
+			String portName) {
+		// TODO Auto-generated method stub
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
+		Map<String, Double> MapCostPrice = new HashMap<String, Double>();
+		for (Map.Entry<String, Double> entry : tickermap.entrySet()) {
 
+			String ticker = entry.getKey();
+			Query queryCostPrice = session.getNamedQuery("getAllFromProvidedRangeForCostPrice")
+					.setParameter("q_tickerName", ticker).setParameter("q_startdate", startdate)
+					.setParameter("q_enddate", uptoendDate).setParameter("q_portName", portName);
+			ArrayList<PortFolio> rsltCost = (ArrayList<PortFolio>) queryCostPrice.getResultList();
+
+			System.out.println("array size for cost price data from port table: " + rsltCost.size());
+			double cost_price = getCostpriceSinglePort(rsltCost);
+			if (!MapCostPrice.containsKey(entry.getKey())) {
+				MapCostPrice.put(entry.getKey(), cost_price);
+			}
+		}
 		session.getTransaction().commit();
 		session.close();
+		return MapCostPrice;
 	}
+
+
 
 	public ArrayList<PortSummaryTable> getSingledata(String portName, String ticker, String d_date) {
 		ArrayList<PortSummaryTable> rslt = new ArrayList<PortSummaryTable>();
@@ -279,15 +292,9 @@ public class PortSummaryTableManager {
 		return rslt;
 	}
 
-	public void delete() {
-		// code to remove a Data
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-
-		session.getTransaction().commit();
-		session.close();
-	}
-
+	/*
+	 * weight in portfolio calculation nad update each row in port summary table
+	 */
 	public void rowUpdateWeightInPortfolio() throws ParseException {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -333,12 +340,10 @@ public class PortSummaryTableManager {
 		session.close();
 	}
 
-	
-	public ArrayList<PortSummaryTable> getEachPortData(String port_name,String d_date){
-		Session session=sessionFactory.openSession();
+	public ArrayList<PortSummaryTable> getEachPortData(String port_name, String d_date) {
+		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		
-		
+
 		Query query = session.getNamedQuery("getEachPortInfo").setParameter("q_portName", port_name)
 				.setParameter("q_date", d_date);
 
@@ -349,12 +354,13 @@ public class PortSummaryTableManager {
 		session.close();
 		return rslt;
 	}
+
 	public void exportData() {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
 		String SQL_QUERY = "select u from PortSummaryTable u where u.port_name='" + "DBH" + "' and u.source_date='"
-				+ "2018-04-02" + "' and share_quantity<>0";
+				+ "2010-06-12" + "' and share_quantity<>0";
 		Query query = session.createQuery(SQL_QUERY);
 		List<PortSummaryTable> rsult = query.getResultList();
 		File fileName = new File("generate_files\\values.txt");
@@ -373,6 +379,28 @@ public class PortSummaryTableManager {
 			System.out.println("The Given Exception is: " + e);
 		}
 
+		session.getTransaction().commit();
+		session.close();
+	}
+	/*
+	 * CASH ticker row insert in summary table
+	 */
+	public void inserRowInSummaryTickerWise(String ticker,String portName){
+		Session session =sessionFactory.openSession();
+		session.beginTransaction();
+		
+		String SQL_QUERY="select u from PortFolio u where u.ticker='" + ticker + "' "
+				+ "and u.portfoli_name='" + portName + "' order by source_date";
+		Query query=session.createQuery(SQL_QUERY);
+		ArrayList<PortFolio> rslt=(ArrayList<PortFolio>) query.getResultList();
+		for(int i=0;i<rslt.size();i++){
+			
+			double curr_price=rslt.get(i).getCurrent_price();
+			double quantity=rslt.get(i).getNumber_of_share();
+			double portfolioValue=curr_price*quantity;
+			
+		}
+		
 		session.getTransaction().commit();
 		session.close();
 	}

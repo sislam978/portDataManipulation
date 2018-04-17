@@ -16,6 +16,18 @@ import javax.persistence.Table;
 			query ="CALL PortsummaryDataforCertainDate(:q_portName,:q_date)",
 			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
 			resultClass=PortSummaryTable.class
+			),
+	@NamedNativeQuery(
+			name="priceChangeOnCertainDate",
+			query ="CALL priceChangeOnCertainDate(:q_tickerName,:q_date)",
+			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+			resultClass=PriceTable.class
+			),
+	@NamedNativeQuery(
+			name="getALLPortValueDataForChart",
+			query ="CALL getALLPortValueDataForChart(:q_portName,:q_sdate,:q_edate)",
+			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+			resultClass=PortfolioValue.class
 			)
 })
 

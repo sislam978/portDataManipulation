@@ -127,17 +127,11 @@ public class PortFolioManager {
     	session.close();
     }
     //inserting new record in portfolio table with introducing CASH ticker
-    public void cashrow_insert(){
+    public void cashrow_insert(String port_name,String d_date){
     	
     	Session session =sessionFactory.openSession();
     	session.beginTransaction();
     	
-    	Scanner scanner=new Scanner(System.in);
-    	System.out.println("Enter portfolio name:");
-    	String port_name=scanner.nextLine();
-    	System.out.println("Enter the desired date:");
-    	String d_date=scanner.nextLine();
-
     	Query query=session.getNamedQuery("getAllOndatePortfolio")
     			.setParameter("q_portName",port_name)
     			.setParameter("q_date", d_date);
@@ -182,16 +176,45 @@ public class PortFolioManager {
     	}
 		return weighted_sum;
 	}
-
-    public void insertRecordsApi(PortFolio rslt){
-    	Session session =  sessionFactory.openSession();
+    
+    public void bulkInsertForCashTicker(String portName){
+    	Session session= sessionFactory.openSession();
     	session.beginTransaction();
     	
+    	Query queryDate = session.getNamedQuery("getDistinctDate");
+    	ArrayList<PortFolio> dates=(ArrayList<PortFolio>) queryDate.getResultList();
     	
-    	session.save(rslt);
+    	for(int i=0;i<dates.size();i++){
+    		cashrow_insert(portName,dates.get(i).getSource_date());
+    	}
     	
     	session.getTransaction().commit();
     	session.close();
+    }
+    /*
+     * Api requested data insertion
+     */
+    public String insertRecordsApi(PortFolio rslt){
+    	Session session =  sessionFactory.openSession();
+    	session.beginTransaction();
+    	
+    	String SQL_QUERY="select u from PortFolio u where u.portfoli_name='" + rslt.getPortfoli_name() + 
+				"' and u.ticker='"+rslt.getTicker()+"' and u.sign='"+rslt.getSign()+
+				"' and u.source_date='"+rslt.getSource_date()+"'and u.number_of_share='"+rslt.getNumber_of_share()+
+				"' and u.cost_price='"+rslt.getCost_price()+"'";
+
+		Query query=session.createQuery(SQL_QUERY);
+		List<PortFolio> list =(List<PortFolio>) query.getResultList();
+		if(list.size()>0){
+			return "not successfull";
+		}
+		else {
+			session.save(rslt);
+		}
+    	
+    	session.getTransaction().commit();
+    	session.close();
+    	return "sucessfull";
     }
 
 	public void update() {

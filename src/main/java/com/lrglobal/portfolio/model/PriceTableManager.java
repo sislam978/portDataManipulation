@@ -79,7 +79,7 @@ public class PriceTableManager {
 						session.saveOrUpdate(rslt.get(j));
 					}
 					else {
-						rslt.get(j).setPrice_change(0.0);
+						rslt.get(j).setPrice_change(1.0);
 						session.saveOrUpdate(rslt.get(j));
 					}
 				}

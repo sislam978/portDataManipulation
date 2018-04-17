@@ -61,11 +61,16 @@ public class App
     			portFolioManager.setup();
     			portFolioManager.Insert(filePath);
     			portFolioManager.exit();
-    		}//portfolio summary table data insert
+    		}
+    		//portfolio summary table data insert
     		else if(command.equalsIgnoreCase("pfsi")){
+    			System.out.println("Take startdate with yyyy-MM-dd format:");
+    			String startdate = input.nextLine();
+    			System.out.println("Take enddate with yyyy-MM-dd format:");
+    			String enddate = input.nextLine();
     			PortSummaryTableManager portmanager=new PortSummaryTableManager();
     			portmanager.setup();
-    			portmanager.Insert();
+    			portmanager.Insert(startdate,enddate);
     			portmanager.exit();
     		}
     		// text export from summary table data //need to change the method for all possible outputs
@@ -117,10 +122,31 @@ public class App
     		}
     		//CASH ticker row insert in portfolio table
     		else if(command.equalsIgnoreCase("cipft")){
+    			System.out.println("Enter portfolio name:");
+    	    	String port_name=input.nextLine();
+    	    	System.out.println("Enter the desired date:");
+    	    	String d_date=input.nextLine();
     			PortFolioManager portFolioManager=new PortFolioManager();
     			portFolioManager.setup();
-    			portFolioManager.cashrow_insert();
+    			portFolioManager.cashrow_insert(port_name,d_date);
     			portFolioManager.exit();
+    		}
+    		//PortfolioValueTable index insert for each row
+    		else if(command.equalsIgnoreCase("pfvtii")){
+    			PortfolioValueManager pValueManager=new PortfolioValueManager();
+    			pValueManager.setup();
+    			pValueManager.insertIndexinEachRow();
+    			pValueManager.exit();
+    		}
+    		/*
+    		 * cash insert within certain date range in portfolio table
+    		 */
+    		else if(command.equals("ciwcd")){
+    			String portName=input.nextLine();
+    			PortFolioManager port=new PortFolioManager();
+    			port.setup();
+    			port.bulkInsertForCashTicker(portName);
+    			port.exit();
     		}
     	}
 //        TestTableManager testTableManager=new TestTableManager();
