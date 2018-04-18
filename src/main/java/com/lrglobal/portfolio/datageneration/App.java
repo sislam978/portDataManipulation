@@ -89,9 +89,15 @@ public class App
     		}
     		// portfolio summary table row update by update weight in portfolio column
     		else if(command.equalsIgnoreCase("pstru")){
+    			System.out.println("Enter the portfolio name:");
+    			String portName=input.nextLine();
+    			System.out.println("Enter the start date we want to start:");
+    			String from_date=input.nextLine();
+    			System.out.println("ENter the end date we want to consider:");
+    			String to_date=input.nextLine();
     			PortSummaryTableManager portmanager=new PortSummaryTableManager();
     			portmanager.setup();
-    			portmanager.rowUpdateWeightInPortfolio();
+    			portmanager.BulkUpdateSummaryRecords(portName,from_date,to_date);
     			portmanager.exit();
     		}
     		//price table data insert
@@ -133,9 +139,18 @@ public class App
     		}
     		//PortfolioValueTable index insert for each row
     		else if(command.equalsIgnoreCase("pfvtii")){
+    			System.out.println("ENter the port Name:");
+
+    			String portName = input.nextLine();
+
+    			System.out.println("ENter the desired date to insert the index value: ");
+    			String d_date = input.nextLine();
+
+    			System.out.println("Enter the desired date");
+    			String source_date = input.nextLine();
     			PortfolioValueManager pValueManager=new PortfolioValueManager();
     			pValueManager.setup();
-    			pValueManager.insertIndexinEachRow();
+    			pValueManager.insertIndexinEachRow(portName,d_date,source_date);
     			pValueManager.exit();
     		}
     		/*
@@ -147,6 +162,25 @@ public class App
     			port.setup();
     			port.bulkInsertForCashTicker(portName);
     			port.exit();
+    		}
+    		/*
+    		 * row summary data insert ticker wise 
+    		 */
+    		else if(command.equals("rsitw")){
+    			System.out.println("insert the port name");
+    			String portName=input.nextLine();
+    			
+    			System.out.println("insert ticker name");
+    			String ticker=input.nextLine();
+    			
+    			System.out.println("insert initial date:");
+    			String from_date=input.nextLine();
+    			System.out.println("insert ending date");
+    			String to_date=input.nextLine();
+    			PortSummaryTableManager summaryMnager=new PortSummaryTableManager();
+    			summaryMnager.setup();
+    			summaryMnager.inserRowInSummaryTickerWise(ticker, portName,from_date,to_date);
+    			summaryMnager.exit();
     		}
     	}
 //        TestTableManager testTableManager=new TestTableManager();

@@ -109,22 +109,9 @@ public class PortfolioValueManager {
 		return rslt;
 	}
 
-	public void insertIndexinEachRow() throws ParseException {
+	public void insertIndexinEachRow(String portName,String d_date,String source_date) throws ParseException {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-
-		Scanner inScanner = new Scanner(System.in);
-		System.out.println("ENter the port Name:");
-
-		String portName = inScanner.nextLine();
-
-		System.out.println("ENter the desired date to insert the index value: ");
-		String d_date = inScanner.nextLine();
-
-		System.out.println("Enter the desired date");
-		String source_date = inScanner.nextLine();
-
-		// SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
 
 		/*
 		 * Taking prev date in the output
@@ -167,6 +154,7 @@ public class PortfolioValueManager {
 
 			ArrayList<PortSummaryTable> rslt = (ArrayList<PortSummaryTable>) query.getResultList();
 			double desiredvalue = 0;
+			
 			for (int i = 0; i < rslt.size(); i++) {
 
 				String SQL_PRICE = "select u from PriceTable u where u.ticker='" + rslt.get(i).getTicker()
@@ -190,8 +178,15 @@ public class PortfolioValueManager {
 					+ src_date + "'";
 			Query indexQuery = session.createQuery(SQL_INDEX);
 			ArrayList<PortfolioValue> indexUpDate = (ArrayList<PortfolioValue>) indexQuery.getResultList();
-			indexUpDate.get(0).setChangePortIndex(desiredvalue);
-			session.update(indexUpDate.get(0));
+			if(rslt.size()<1){
+				indexUpDate.get(0).setChangePortIndex(1.0);
+				session.update(indexUpDate.get(0));
+			}
+			else{
+				indexUpDate.get(0).setChangePortIndex(desiredvalue);
+				session.update(indexUpDate.get(0));
+			}
+			
 		}
 
 		session.getTransaction().commit();

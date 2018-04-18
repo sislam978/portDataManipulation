@@ -92,9 +92,6 @@ public class PortFolioManager {
         			list.get(0).setNumber_of_share(rslt.get(i).getNumber_of_share());
         			session.saveOrUpdate(list.get(0));
     			}
-    			
-    			//i=i+list.size();
-    			//continue;
     		}
     		else{
     			session.save(pp);
@@ -141,21 +138,39 @@ public class PortFolioManager {
     	double cash_NumShare=calculateShare(rslt);
     	
     	if(cash_NumShare>0){
-    		portFolio.setSign(buy);
+    		portFolio.setSign(sell);
     		portFolio.setNumber_of_share(cash_NumShare);
     	}
     	else{
-    		portFolio.setSign(sell);
+    		portFolio.setSign(buy);
     		cash_NumShare=0-cash_NumShare;
     		portFolio.setNumber_of_share(cash_NumShare);
     	}
+    	
     	portFolio.setCurrent_price(Cashcurrent_price);
     	portFolio.setCost_price(Cashcost_price);
     	portFolio.setTicker(cashTicker);
     	portFolio.setPortfoli_name(port_name);
     	portFolio.setSource_date(d_date);
+    	String SQL_QUERY="select u from PortFolio u where u.portfoli_name='" + port_name + 
+				"' and u.ticker='"+cashTicker+"' and u.source_date='"+d_date+"' and u.created_by<>1";
+    	Query queryPort=session.createQuery(SQL_QUERY);
+    	ArrayList<PortFolio> rsltport=(ArrayList<PortFolio>) queryPort.getResultList();
+    	if(rsltport.size()>0){
+    		rsltport.get(0).setNumber_of_share(cash_NumShare);
+    		if(cash_NumShare>0){
+    			rsltport.get(0).setSign(sell);
+    		}
+    		else{
+    			rsltport.get(0).setSign(buy);
+    		}
+    		session.saveOrUpdate(rsltport.get(0));
+    		
+    	}
+    	else{
+    		session.save(portFolio);
+    	}
     	
-    	session.save(portFolio);
     	
     	session.getTransaction().commit();
     	session.close();
@@ -217,7 +232,7 @@ public class PortFolioManager {
     	return "sucessfull";
     }
 
-	public void update() {
+	public void updateCashonDate( ) {
         // code to modify a Data
     	Session session = sessionFactory.openSession();
     	session.beginTransaction();
