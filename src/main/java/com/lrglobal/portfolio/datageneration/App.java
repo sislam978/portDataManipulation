@@ -82,9 +82,16 @@ public class App
     		}
     		//portfolio Value table data insert
     		else if(command.equalsIgnoreCase("pfvi")){
+    			System.out.println("Enter the desired Port Name");
+    			String portName = input.nextLine();
+    			
+    			System.out.println("Enter the desired date");
+    			String source_date = input.nextLine();
+    			System.out.println("Up to the date we wan to calculate:");
+    			String E_date = input.nextLine();
     			PortfolioValueManager portfolioValueManager=new PortfolioValueManager();
     			portfolioValueManager.setup();
-    			portfolioValueManager.Insert();
+    			portfolioValueManager.Insert(portName,source_date,E_date);
     			portfolioValueManager.exit();
     		}
     		// portfolio summary table row update by update weight in portfolio column

@@ -100,6 +100,9 @@ public class PortSummaryTable {
 	@Column(name="deleted_on")
 	private String deleted_on;
 
+	@Column(name="delete_flag")
+	private Integer delete_flag;
+	
 	public long getPort_id() {
 		return port_id;
 	}
@@ -202,6 +205,15 @@ public class PortSummaryTable {
 
 	public void setDeleted_on(String deleted_on) {
 		this.deleted_on = deleted_on;
+	}
+
+	
+	public Integer getDelete_flag() {
+		return delete_flag;
+	}
+
+	public void setDelete_flag(Integer delete_flag) {
+		this.delete_flag = delete_flag;
 	}
 
 	@Override

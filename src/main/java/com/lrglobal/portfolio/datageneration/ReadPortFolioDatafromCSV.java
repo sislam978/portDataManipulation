@@ -51,56 +51,40 @@ public class ReadPortFolioDatafromCSV {
 //				else{
 //					portFolio.setSector(csvRecord.get(1).toString());
 //				}
-				if(csvRecord.get(2).toString().equals("")){
+				if(csvRecord.get(1).toString().equals("")){
 					portFolio.setNumber_of_share(null);
 				}
 				else{
-					portFolio.setNumber_of_share(Double.parseDouble(csvRecord.get(2).toString()));
+					portFolio.setNumber_of_share(Double.parseDouble(csvRecord.get(1).toString()));
 				}
-				if(csvRecord.get(3).toString().equals("")){
+				if(csvRecord.get(2).toString().equals("")){
 					portFolio.setCost_price(null);
 				}
 				else{
-					portFolio.setCost_price(Double.parseDouble(csvRecord.get(3).toString()));
+					portFolio.setCost_price(Double.parseDouble(csvRecord.get(2).toString()));
 				}
-				if(csvRecord.get(4).toString().equals("")){
+				if(csvRecord.get(3).toString().equals("")){
 					portFolio.setSign(null);
 				}
 				else{
-					portFolio.setSign(csvRecord.get(4).toString());
+					portFolio.setSign(csvRecord.get(3).toString());
 				}
 				
-				if(csvRecord.get(5).toString().equals("")){
+				if(csvRecord.get(4).toString().equals("")){
 					portFolio.setSource_date(null);
 				}
 				else{
-					String dd=csvRecord.get(5).toString();
+					String dd=csvRecord.get(4).toString();
 					App aa= new App();
 					String f_date=aa.dateFormation(dd);
 					portFolio.setSource_date(f_date);
 				}
-				if(csvRecord.get(6).toString().equals("")){
+				if(csvRecord.get(5).toString().equals("")){
 					portFolio.setPortfoli_name(null);
 				}
 				else{
 					
-					portFolio.setPortfoli_name(csvRecord.get(6).toString());
-				}
-				
-				if(csvRecord.get(7).toString().equals("")){
-					portFolio.setCurrent_price(null);
-				}
-				else{
-					
-					portFolio.setCurrent_price(Double.parseDouble(csvRecord.get(7).toString()));
-				}
-				
-				if(csvRecord.get(8).toString().equals("")){
-					portFolio.setprice_change(null);
-				}
-				else{
-					
-					portFolio.setprice_change(Double.parseDouble(csvRecord.get(8).toString()));
+					portFolio.setPortfoli_name(csvRecord.get(5).toString());
 				}
 				result.add(portFolio);
 			}

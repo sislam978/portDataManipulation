@@ -176,6 +176,7 @@ public class PortSummaryTableManager {
 					portSummary.setCost_price(MapCostPrice.get(entry.getKey()));
 					portSummary.setCurrent_price(MapCurrentPrice.get(entry.getKey()));
 					portSummary.setPortfoli_value(MapportfolioValue.get(entry.getKey()));
+					portSummary.setDelete_flag(0);
 					// save method of hibernate
 					session.save(portSummary);
 				}
@@ -265,12 +266,20 @@ public class PortSummaryTableManager {
 					.setParameter("q_tickerName", ticker).setParameter("q_startdate", startdate)
 					.setParameter("q_enddate", uptoendDate).setParameter("q_portName", portName);
 			ArrayList<PortFolio> rsltCost = (ArrayList<PortFolio>) queryCostPrice.getResultList();
-
 			System.out.println("array size for cost price data from port table: " + rsltCost.size());
+			
 			double cost_price = getCostpriceSinglePort(rsltCost);
 			if (!MapCostPrice.containsKey(entry.getKey())) {
-				MapCostPrice.put(entry.getKey(), cost_price);
+				if(entry.getKey().equals("CASH")){
+					MapCostPrice.put(entry.getKey(), 1.0);
+				}
+				else{
+					MapCostPrice.put(entry.getKey(), cost_price);
+				}
+					
 			}
+			
+			
 		}
 		session.getTransaction().commit();
 		session.close();
@@ -357,7 +366,7 @@ public class PortSummaryTableManager {
 		session.beginTransaction();
 
 		String SQL_QUERY = "select u from PortSummaryTable u where u.port_name='" + "DBH" + "' and u.source_date='"
-				+ "2010-06-12" + "' and share_quantity<>0";
+				+ "2010-06-12" + "' and u.share_quantity<>0 and u.delete_flag<>1";
 		Query query = session.createQuery(SQL_QUERY);
 		List<PortSummaryTable> rsult = query.getResultList();
 		File fileName = new File("generate_files\\values.txt");
@@ -388,7 +397,7 @@ public class PortSummaryTableManager {
 		session.beginTransaction();
 
 		String SQL_QUERY = "select u from PortFolio u where u.ticker='" + ticker + "' " + "and u.portfoli_name='"
-				+ portName + "' order by source_date";
+				+ portName + "' and u.delete_flag<>1 order by u.source_date";
 		Query query = session.createQuery(SQL_QUERY);
 		ArrayList<PortFolio> rslt = (ArrayList<PortFolio>) query.getResultList();
 		Map<String, Double> datewiseMap = new HashMap<String, Double>();
@@ -518,6 +527,7 @@ public class PortSummaryTableManager {
 			}
 			
 			p_summary.setPortfoli_value(portValues.get(entry.getKey()));
+			p_summary.setDelete_flag(0);
 			session.save(p_summary);
 			session.flush();
 			session.clear();
@@ -525,5 +535,47 @@ public class PortSummaryTableManager {
 		session.getTransaction().commit();
 		session.close();
 	}
+	
+	/*
+	 * after inserting the newly cashrow, make delete flag on all the records from summary table on that date and re calculate all the 
+	 * things for the date an dinsert new records on summary on that date
+	 */
+	 public void summarytableDataDropAndInsert(String port_name, String d_date) throws ParseException, SQLException {
+			// TODO Auto-generated method stub
+		 Session session = sessionFactory.openSession();
+		 session.beginTransaction();
+		
+		 String SQL_QUERY = "select u from PortSummaryTable u where u.port_name='" + port_name + "' and u.source_date='"
+					+ d_date + "' and u.delete_flag<>1";
+		 Query query =session.createQuery(SQL_QUERY);
+		 ArrayList<PortSummaryTable> rslt=(ArrayList<PortSummaryTable>) query.getResultList();
+		 if(rslt.size()>0){
+			 for(int i=0;i<rslt.size();i++){
+				 rslt.get(i).setDelete_flag(1);
+				 session.update(rslt.get(i));
+			 }
+		 }
+		 session.getTransaction().commit();
+		 session.close();
+		 
+		 //callforSummarydataInsert(port_name,d_date);
+		}
+	 
+	 public ArrayList<PortSummaryTable> prev_datePortSummary(String portName,String prev_date){
+		 Session session=sessionFactory.openSession();
+		 session.beginTransaction();
+		 
+		String SQL_QUERY = "select u from PortSummaryTable u where u.port_name='" + portName
+					+ "' and u.source_date='" + prev_date + "' and u.delete_flag<>1";
+
+		Query query = session.createQuery(SQL_QUERY);
+		ArrayList<PortSummaryTable> rslt=(ArrayList<PortSummaryTable>)query.getResultList();
+		
+		session.getTransaction().commit();
+		session.close();
+		
+		return rslt;
+		 
+	 }
 
 }

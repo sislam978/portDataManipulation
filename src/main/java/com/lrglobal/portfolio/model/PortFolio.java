@@ -28,7 +28,14 @@ import org.codehaus.jackson.map.ObjectMapper;
 			query="CALL getDistinctDate()",
 			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
 			resultClass=PortFolio.class
+			),
+	@NamedNativeQuery(
+			name="getinitialdate",
+			query="CALL getinitialdate(:q_PortName)",
+			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+			resultClass=PortFolio.class
 			)
+	
 })
 
 @Entity
@@ -94,6 +101,9 @@ public class PortFolio {
 	
 //	@Column(name="Sector")
 //	private String sector;
+	
+	@Column(name="delete_flag")
+	private Integer delete_flag;
 
 	public long getPortfolio_id() {
 		return portfolio_id;
@@ -241,6 +251,16 @@ public class PortFolio {
 //		this.sector = sector;
 //	}
 	
+
+	public Integer getDelete_flag() {
+		return delete_flag;
+	}
+
+	public void setDelete_flag(Integer delete_flag) {
+		this.delete_flag = delete_flag;
+	}
+
+
 
 	public static Comparator<PortFolio> sortingdata = new Comparator<PortFolio>() {
 

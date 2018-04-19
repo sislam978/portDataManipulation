@@ -1,7 +1,12 @@
 package com.lrglobal.portfolio.model;
 
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -10,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.criterion.Order;
 import org.hibernate.query.Query;
 
 import com.lrglobal.portfolio.datageneration.ReadPortFolioDatafromCSV;
@@ -63,9 +69,10 @@ public class PortFolioManager {
     	for(int i=0;i<rslt.size();i++){
     		PortFolio pp=rslt.get(i);
     		
+    		
     		String SQL_QUERY="select u from PortFolio u where u.portfoli_name='" + rslt.get(i).getPortfoli_name() + 
     				"' and u.ticker='"+rslt.get(i).getTicker()+"' and u.sign='"+rslt.get(i).getSign()+
-    				"' and u.source_date='"+rslt.get(i).getSource_date()+"'";
+    				"' and u.source_date='"+rslt.get(i).getSource_date()+"' and u.delete_flag<>1";
 
     		Query query=session.createQuery(SQL_QUERY);
     		List<PortFolio> list =(List<PortFolio>) query.getResultList();
@@ -85,6 +92,7 @@ public class PortFolioManager {
     					list.get(0).setCost_price(avgCostPrice);
     				}
         			list.get(0).setNumber_of_share(quantity);
+        		
         			session.saveOrUpdate(list.get(0));
     			}
     			else if(rslt.get(i).getNumber_of_share()!=null){
@@ -94,6 +102,7 @@ public class PortFolioManager {
     			}
     		}
     		else{
+    			pp.setDelete_flag(0);
     			session.save(pp);
     		}
     		
@@ -124,7 +133,7 @@ public class PortFolioManager {
     	session.close();
     }
     //inserting new record in portfolio table with introducing CASH ticker
-    public void cashrow_insert(String port_name,String d_date){
+    public void cashrow_insert(String port_name,String d_date) throws ParseException, SQLException{
     	
     	Session session =sessionFactory.openSession();
     	session.beginTransaction();
@@ -153,7 +162,7 @@ public class PortFolioManager {
     	portFolio.setPortfoli_name(port_name);
     	portFolio.setSource_date(d_date);
     	String SQL_QUERY="select u from PortFolio u where u.portfoli_name='" + port_name + 
-				"' and u.ticker='"+cashTicker+"' and u.source_date='"+d_date+"' and u.created_by<>1";
+				"' and u.ticker='"+cashTicker+"' and u.source_date='"+d_date+"' and u.created_by is null and u.delete_flag<>1";
     	Query queryPort=session.createQuery(SQL_QUERY);
     	ArrayList<PortFolio> rsltport=(ArrayList<PortFolio>) queryPort.getResultList();
     	if(rsltport.size()>0){
@@ -164,19 +173,24 @@ public class PortFolioManager {
     		else{
     			rsltport.get(0).setSign(buy);
     		}
-    		session.saveOrUpdate(rsltport.get(0));
+    		session.update(rsltport.get(0));
     		
     	}
     	else{
+    		portFolio.setDelete_flag(0);
     		session.save(portFolio);
     	}
+    	
     	
     	
     	session.getTransaction().commit();
     	session.close();
     	
+    	//summarytableDataDropAndInsert(port_name,d_date);
+    	
     }
- // calculating the cash weight value in the method
+
+	// calculating the cash weight value in the method
     private double calculateShare(ArrayList<PortFolio> rslt) {
 		// TODO Auto-generated method stub
     	//double share_quantity=0;
@@ -192,7 +206,7 @@ public class PortFolioManager {
 		return weighted_sum;
 	}
     
-    public void bulkInsertForCashTicker(String portName){
+    public void bulkInsertForCashTicker(String portName) throws ParseException, SQLException{
     	Session session= sessionFactory.openSession();
     	session.beginTransaction();
     	
@@ -209,14 +223,14 @@ public class PortFolioManager {
     /*
      * Api requested data insertion
      */
-    public String insertRecordsApi(PortFolio rslt){
+    public String insertRecordsApi(PortFolio rslt) throws ParseException, SQLException{
     	Session session =  sessionFactory.openSession();
     	session.beginTransaction();
     	
     	String SQL_QUERY="select u from PortFolio u where u.portfoli_name='" + rslt.getPortfoli_name() + 
 				"' and u.ticker='"+rslt.getTicker()+"' and u.sign='"+rslt.getSign()+
 				"' and u.source_date='"+rslt.getSource_date()+"'and u.number_of_share='"+rslt.getNumber_of_share()+
-				"' and u.cost_price='"+rslt.getCost_price()+"'";
+				"' and u.cost_price='"+rslt.getCost_price()+"' and u.delete_flag<>1";
 
 		Query query=session.createQuery(SQL_QUERY);
 		List<PortFolio> list =(List<PortFolio>) query.getResultList();
@@ -224,11 +238,18 @@ public class PortFolioManager {
 			return "not successfull";
 		}
 		else {
+			if(rslt.getTicker().equals("CASH")){
+				rslt.setCreated_by(1);
+			}
+			rslt.setDelete_flag(0);
 			session.save(rslt);
 		}
     	
     	session.getTransaction().commit();
     	session.close();
+    
+    	//cashrow_insert(rslt.getPortfoli_name(), rslt.getSource_date());
+    	
     	return "sucessfull";
     }
 
@@ -252,5 +273,17 @@ public class PortFolioManager {
     	session.close();
     }
 
+    public String takeinitialdate(String portName){
+    	
+    	Session session=sessionFactory.openSession();
+    	session.beginTransaction();
+    	
+    	Query query=session.getNamedQuery("getinitialdate").setParameter("q_PortName", portName);
+    	ArrayList<PortFolio> rslt= (ArrayList<PortFolio>) query.getResultList();
+    	
+    	session.getTransaction().commit();
+    	session.close();
+    	return rslt.get(0).getSource_date();
+    }
 
 }

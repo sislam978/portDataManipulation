@@ -48,19 +48,13 @@ public class PortfolioValueManager {
 
 	}
 
-	public void Insert() throws ParseException {
+	public void Insert(String portName,String source_date, String E_date) throws ParseException {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		Scanner inScanner = new Scanner(System.in);
-		System.out.println("Enter the desired Port Name");
-		String portName = inScanner.nextLine();
-		System.out.println("Enter the desired date");
-		String source_date = inScanner.nextLine();
-
+		
 		SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
 		Date dateStart = input_format.parse(source_date);
-		System.out.println("Up to the date we wan to calculate:");
-		String E_date = inScanner.nextLine();
+		
 		Date EndDate = input_format.parse(E_date);
 
 		Calendar start = Calendar.getInstance();
@@ -84,7 +78,7 @@ public class PortfolioValueManager {
 			portfolioValue.setPortName(rslt.get(0).getPort_name());
 			portfolioValue.setSource_date(rslt.get(0).getSource_date());
 			portfolioValue.setPortfolio_value(portValue);
-
+			portfolioValue.setDelete_flag(0);
 			session.save(portfolioValue);
 		}
 
@@ -99,7 +93,7 @@ public class PortfolioValueManager {
 		ArrayList<PortfolioValue> rslt = new ArrayList<PortfolioValue>();
 
 		String SQL_QUERY = "select u from PortfolioValue u where u.portName='" + portName + "' and u.source_date='"
-				+ d_date + "'";
+				+ d_date + "' and u.delete_flag<>1";
 		Query query = session.createQuery(SQL_QUERY);
 		rslt = (ArrayList<PortfolioValue>) query.getResultList();
 
@@ -147,12 +141,11 @@ public class PortfolioValueManager {
 			 * portfolio value table within a certain portname and date.
 			 * Hibernate update operation will need
 			 */
-			String SQL_QUERY = "select u from PortSummaryTable u where u.port_name='" + portName
-					+ "' and u.source_date='" + prev_date + "'";
 
-			Query query = session.createQuery(SQL_QUERY);
-
-			ArrayList<PortSummaryTable> rslt = (ArrayList<PortSummaryTable>) query.getResultList();
+			PortSummaryTableManager pstm=new PortSummaryTableManager();
+			pstm.setup();
+			ArrayList<PortSummaryTable> rslt = pstm.prev_datePortSummary(portName,prev_date);
+			pstm.exit();
 			double desiredvalue = 0;
 			
 			for (int i = 0; i < rslt.size(); i++) {
@@ -160,7 +153,7 @@ public class PortfolioValueManager {
 				String SQL_PRICE = "select u from PriceTable u where u.ticker='" + rslt.get(i).getTicker()
 						+ "' and u.price_date='" + src_date + "'";
 				Query priceQuery = session.createQuery(SQL_PRICE);
-				ArrayList<PriceTable> priceChange = (ArrayList<PriceTable>) priceQuery.getResultList();
+				ArrayList<PriceTable> priceChange=(ArrayList<PriceTable>)priceQuery.getResultList();
 				if (priceChange.size() > 0) {
 					double vv = rslt.get(i).getWeightInPortfolio() * priceChange.get(0).getPrice_change();
 					desiredvalue += vv;
@@ -175,7 +168,7 @@ public class PortfolioValueManager {
 			 * certain portfolio value table record update with change in index
 			 */
 			String SQL_INDEX = "select u from PortfolioValue u where u.portName='" + portName + "' and u.source_date='"
-					+ src_date + "'";
+					+ src_date + "' and u.delete_flag<>1";
 			Query indexQuery = session.createQuery(SQL_INDEX);
 			ArrayList<PortfolioValue> indexUpDate = (ArrayList<PortfolioValue>) indexQuery.getResultList();
 			if(rslt.size()<1){
@@ -270,5 +263,29 @@ public class PortfolioValueManager {
 		session.close();
 		return rslt;
 	}
+	
+	/*
+	 * portfolio value table select data to on delete flag and call insertion method of portfolio value table
+	 */
+		public void deleteandReInsertonDate(String port_name, String d_date, String end_date) throws ParseException {
+			// TODO Auto-generated method stub
+			Session session=sessionFactory.openSession();
+			session.beginTransaction();
+			
+			String SQL_QUERY="select u from PortfolioValue u where u.portName='" + port_name + "' and u.source_date='"
+					+ d_date + "'";
+			Query query =session.createQuery(SQL_QUERY);
+			
+			ArrayList<PortfolioValue> rslt=(ArrayList<PortfolioValue>)query.getResultList();
+			if(rslt.size()>0){
+				for(int  i=0;i<rslt.size();i++){
+					rslt.get(i).setDelete_flag(1);
+					session.update(rslt.get(i));
+				}
+				
+			}
+			session.getTransaction().commit();
+			session.close();			
+		}
 
 }

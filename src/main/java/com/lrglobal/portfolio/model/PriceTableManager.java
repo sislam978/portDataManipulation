@@ -129,6 +129,6 @@ public class PriceTableManager {
 		session.getTransaction().commit();
 		session.close();
 	}
-	
+
 
 }

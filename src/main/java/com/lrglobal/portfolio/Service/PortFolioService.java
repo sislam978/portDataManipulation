@@ -1,6 +1,9 @@
 package com.lrglobal.portfolio.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -134,19 +137,95 @@ public class PortFolioService {
 
 			port.setSign(primaryData[11].substring(1, primaryData[11].length() - 2));
 
+			String ticker = primaryData[3].substring(1, primaryData[3].length() - 1);
+			String portName = primaryData[1].substring(1, primaryData[1].length() - 1);
+			String d_date = primaryData[9].substring(1, primaryData[9].length() - 1);
+			String ss = null;
+			
 			PortFolioManager portManager = new PortFolioManager();
 			portManager.setup();
-			String ss=portManager.insertRecordsApi(port);
+			portManager.insertRecordsApi(port);
 			portManager.exit();
-			
+
+			/*
+			 * Cash ticker record insert in portfolio Table
+			 */
+			PortFolioManager portManager1 = new PortFolioManager();
+			portManager1.setup();
+			portManager1.cashrow_insert(portName, d_date);
+			portManager1.exit();
+
+			/*
+			 * Drop Summar Table data if exist on the date by enabling flag in
+			 * delete_flag
+			 */
+			PortSummaryTableManager pstm = new PortSummaryTableManager();
+			pstm.setup();
+			pstm.summarytableDataDropAndInsert(portName, d_date);
+			pstm.exit();
+
+			/*
+			 * after make delete flag on re insert the data for that date
+			 */
+			SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
+			Date dateStart = input_format.parse(d_date);
+			Calendar end = Calendar.getInstance();
+			end.setTime(dateStart);
+			end.add(Calendar.DATE, 1); // number of days to add
+			String end_date = input_format.format(end.getTime());
+
+			PortSummaryTableManager pstm1 = new PortSummaryTableManager();
+			pstm1.setup();
+			pstm1.Insert(d_date, end_date);
+			pstm1.exit();
+
+			/*
+			 * portfolio value table select data to on delete flag and call
+			 * insertion method of portfolio value table
+			 */
+			PortfolioValueManager pfvm = new PortfolioValueManager();
+			pfvm.setup();
+			pfvm.deleteandReInsertonDate(portName, d_date, end_date);
+			pfvm.exit();
+
+			/*
+			 * re insert new records in portfolio value table on the date
+			 */
+			PortfolioValueManager pfvm1 = new PortfolioValueManager();
+			pfvm1.setup();
+			pfvm1.Insert(portName, d_date, end_date);
+			pfvm1.exit();
+
+			/*
+			 * Summary table row update after inserting the new rows in
+			 * portfolio value table
+			 */
+			PortSummaryTableManager pstm2 = new PortSummaryTableManager();
+			pstm2.setup();
+			pstm2.rowUpdateWeightInPortfolio(portName, d_date);
+			pstm2.exit();
+
+			/*
+			 * Change in index calculation and update each row on the date in
+			 * portfolio value table
+			 */
+			PortfolioValueManager pfvm2 = new PortfolioValueManager();
+			pfvm2.setup();
+			pfvm2.insertIndexinEachRow(portName, end_date, d_date);
+			pfvm2.exit();
+
+			/*
+			 * the whole cycle will finish here from portfolio table to summary
+			 * table to portfolio value table data insert and updates
+			 */
+
 			Gson gson = new Gson();
-			if(ss.equals("sucessfull")){
+			if (ss.equals("sucessfull")) {
 				return_string = gson.toJson("successfully insert the data");
-			}
-			else{
+			} else {
 				return_string = gson.toJson("please put valid data");
 			}
-			
+
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println("Giving Exception due to: " + e);
@@ -165,7 +244,7 @@ public class PortFolioService {
 		try {
 			Map<String, Double> rslt = new HashMap<String, Double>();
 			PortfolioValueManager portValueManager = new PortfolioValueManager();
-			
+
 			portValueManager.setup();
 			rslt = portValueManager.getALlValueFOrChart(portName, startDate, endDate);
 			portValueManager.exit();
@@ -180,13 +259,13 @@ public class PortFolioService {
 
 		return return_string;
 	}
-	
+
 	@POST
 	@Produces("application/json")
 	@Consumes("application/json")
 	@Path("/test")
-	public String Testdata(String data){
-		String retrun_data= null;
+	public String Testdata(String data) {
+		String retrun_data = null;
 		retrun_data = data;
 		System.out.println(data);
 		return "sucessfully recieved.";
