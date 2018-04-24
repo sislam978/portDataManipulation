@@ -72,8 +72,9 @@ public class PriceTableManager {
 			if(rslt.size()>0){
 				rslt.get(0).setPrice_change(0.0);
 				session.saveOrUpdate(rslt.get(0));
+				//System.out.println(i +" : "+rslt.get(i).getPrice());
 				for(int j=1;j<rslt.size();j++){
-					if(rslt.get(j-1).getPrice()!=0){
+					if(rslt.get(j-1).getPrice()>0){
 						double price_change= rslt.get(j).getPrice()/rslt.get(j-1).getPrice();
 						rslt.get(j).setPrice_change(price_change);
 						session.saveOrUpdate(rslt.get(j));

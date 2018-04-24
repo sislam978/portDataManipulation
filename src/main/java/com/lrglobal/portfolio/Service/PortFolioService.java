@@ -25,6 +25,8 @@ import com.lrglobal.portfolio.model.PortFolio;
 import com.lrglobal.portfolio.model.PortFolioManager;
 import com.lrglobal.portfolio.model.PortSummaryTable;
 import com.lrglobal.portfolio.model.PortSummaryTableManager;
+import com.lrglobal.portfolio.model.PortfolioNameTable;
+import com.lrglobal.portfolio.model.PortfolioNameTableManager;
 import com.lrglobal.portfolio.model.PortfolioValue;
 import com.lrglobal.portfolio.model.PortfolioValueManager;
 
@@ -90,15 +92,32 @@ public class PortFolioService {
 	public String getSinglePortValue(@PathParam("p_portname") String port_name, @PathParam("pd_date") String d_date) {
 		// this.input = input;
 		String return_String = null;
+		String text=null;
 		try {
 			ArrayList<PortfolioValue> rslt = new ArrayList<PortfolioValue>();
 			PortfolioValueManager portValueManager = new PortfolioValueManager();
+			
 			portValueManager.setup();
 			rslt = portValueManager.getSinglePortValueData(port_name, d_date);
 			portValueManager.exit();
+			
+			PortSummaryTableManager pstm=new PortSummaryTableManager();
+			pstm.setup();
+			ArrayList<PortSummaryTable> pst=pstm.getSingledata(rslt.get(0).getPortName(),"CASH", d_date);
+			pstm.exit();
+			//char ch='"';
+			Map<String,String> sendString=new HashMap<String,String>();
+			
+			
+			sendString.put("portName", rslt.get(0).getPortName());
+			sendString.put("portfolio_value", rslt.get(0).getPortfolio_value().toString());
+			sendString.put("cash", pst.get(0).getShare_quantity().toString());
+			sendString.put("source_date", rslt.get(0).getSource_date());
+			
 			Gson gson = new Gson();
-			System.out.println("Json output: " + gson.toJson(rslt));
-			return_String = gson.toJson(rslt);
+			
+			return_String = gson.toJson(sendString);
+			System.out.println("json string: "+return_String);
 
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -144,7 +163,7 @@ public class PortFolioService {
 			
 			PortFolioManager portManager = new PortFolioManager();
 			portManager.setup();
-			portManager.insertRecordsApi(port);
+			ss=portManager.insertRecordsApi(port);
 			portManager.exit();
 
 			/*
@@ -154,70 +173,6 @@ public class PortFolioService {
 			portManager1.setup();
 			portManager1.cashrow_insert(portName, d_date);
 			portManager1.exit();
-
-			/*
-			 * Drop Summar Table data if exist on the date by enabling flag in
-			 * delete_flag
-			 */
-			PortSummaryTableManager pstm = new PortSummaryTableManager();
-			pstm.setup();
-			pstm.summarytableDataDropAndInsert(portName, d_date);
-			pstm.exit();
-
-			/*
-			 * after make delete flag on re insert the data for that date
-			 */
-			SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
-			Date dateStart = input_format.parse(d_date);
-			Calendar end = Calendar.getInstance();
-			end.setTime(dateStart);
-			end.add(Calendar.DATE, 1); // number of days to add
-			String end_date = input_format.format(end.getTime());
-
-			PortSummaryTableManager pstm1 = new PortSummaryTableManager();
-			pstm1.setup();
-			pstm1.Insert(d_date, end_date);
-			pstm1.exit();
-
-			/*
-			 * portfolio value table select data to on delete flag and call
-			 * insertion method of portfolio value table
-			 */
-			PortfolioValueManager pfvm = new PortfolioValueManager();
-			pfvm.setup();
-			pfvm.deleteandReInsertonDate(portName, d_date, end_date);
-			pfvm.exit();
-
-			/*
-			 * re insert new records in portfolio value table on the date
-			 */
-			PortfolioValueManager pfvm1 = new PortfolioValueManager();
-			pfvm1.setup();
-			pfvm1.Insert(portName, d_date, end_date);
-			pfvm1.exit();
-
-			/*
-			 * Summary table row update after inserting the new rows in
-			 * portfolio value table
-			 */
-			PortSummaryTableManager pstm2 = new PortSummaryTableManager();
-			pstm2.setup();
-			pstm2.rowUpdateWeightInPortfolio(portName, d_date);
-			pstm2.exit();
-
-			/*
-			 * Change in index calculation and update each row on the date in
-			 * portfolio value table
-			 */
-			PortfolioValueManager pfvm2 = new PortfolioValueManager();
-			pfvm2.setup();
-			pfvm2.insertIndexinEachRow(portName, end_date, d_date);
-			pfvm2.exit();
-
-			/*
-			 * the whole cycle will finish here from portfolio table to summary
-			 * table to portfolio value table data insert and updates
-			 */
 
 			Gson gson = new Gson();
 			if (ss.equals("sucessfull")) {
@@ -259,7 +214,167 @@ public class PortFolioService {
 
 		return return_string;
 	}
+	
+	@POST
+	@Produces("application/json")
+	@Consumes("application/json")
+	@Path("/newPortInsert")
+	public String InsertNewPortfolioName(PortfolioNameTable newPort){
+		String return_string=null;
+		try{
+			PortfolioNameTableManager newportMan=new PortfolioNameTableManager();
+			newportMan.setup();
+			return_string=newportMan.Insert(newPort);
+			newportMan.exit();
+			Gson gson = new Gson();
+			if (return_string.equals("Successfull")) {
+				return_string = gson.toJson("successfully insert the data");
+			} else {
+				return_string = gson.toJson("please put valid data");
+			}
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Exception in service providing during inserting newportfolio name: " + e);
+		}
+		return return_string;
+	}
 
+	
+	@POST
+	@Produces("application/json")
+	@Consumes("application/json")
+	@Path("/portValuesChart")
+	public String sendPortValuesDateRange(String json){
+		String return_string = null;
+
+		try {
+			
+			String[] primaryData = json.split(",|:");
+			for (int i = 0; i < primaryData.length; i++) {
+				System.out.println(primaryData[i]);
+			}
+			String portName=primaryData[1].substring(1, primaryData[1].length() - 1);
+			String Start_date=primaryData[3].substring(1,primaryData[3].length() - 1);
+			String end_date=primaryData[5].substring(1, primaryData[5].length() - 2);
+			
+			Map<String, Double> rslt = new HashMap<String, Double>();
+			PortfolioValueManager portValueManager = new PortfolioValueManager();
+
+			portValueManager.setup();
+			rslt = portValueManager.portValuesForChart(portName, Start_date, end_date);
+			portValueManager.exit();
+			Gson gson = new Gson();
+			System.out.println("Json output: " + gson.toJson(rslt));
+			return_string = gson.toJson(rslt);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Exception in service providing: " + e);
+		}
+
+		return return_string;
+	}
+	
+	@POST
+	@Produces("application/json")
+	@Consumes("application/json")
+	@Path("/updateSummaryPortValue")
+	public String updaterowsSummaryAndPortvalue(String json){
+		String return_string = null;
+
+		try {
+			
+			String[] primaryData = json.split(",|:");
+			for (int i = 0; i < primaryData.length; i++) {
+				System.out.println(primaryData[i]);
+			}
+			String portName=primaryData[1].substring(1, primaryData[1].length() - 1);
+			String Start_date=primaryData[3].substring(1,primaryData[3].length() - 1);
+			String end_date1=primaryData[5].substring(1, primaryData[5].length() - 2);
+			
+			SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
+			Date eee = input_format.parse(end_date1);
+			Calendar end = Calendar.getInstance();
+			end.setTime(eee);
+			end.add(Calendar.DATE, 1); // number of days to add
+			String end_date = input_format.format(end.getTime());
+			
+			/*
+			 * Drop Summar Table data if exist on the date by enabling flag in
+			 * delete_flag
+			 */
+			PortSummaryTableManager pstm = new PortSummaryTableManager();
+			pstm.setup();
+			pstm.summarytableDataDropAndInsert(portName, Start_date,end_date);
+			pstm.exit();
+
+			/*
+			 * after make delete flag on re insert the data for that date
+			 */
+			//SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
+			
+//			Calendar end = Calendar.getInstance();
+//			end.setTime(dateStart);
+//			end.add(Calendar.DATE, 1); // number of days to add
+//			String end_date = input_format.format(end.getTime());
+//
+			PortSummaryTableManager pstm1 = new PortSummaryTableManager();
+			pstm1.setup();
+			pstm1.Insert(portName,Start_date, end_date);
+			pstm1.exit();
+
+			/*
+			 * portfolio value table select data to on delete flag and call
+			 * insertion method of portfolio value table
+			 */
+			PortfolioValueManager pfvm = new PortfolioValueManager();
+			pfvm.setup();
+			pfvm.deleteandReInsertonDate(portName, Start_date, end_date);
+			pfvm.exit();
+
+			/*
+			 * re insert new records in portfolio value table on the date
+			 */
+			PortfolioValueManager pfvm1 = new PortfolioValueManager();
+			pfvm1.setup();
+			pfvm1.Insert(portName, Start_date, end_date);
+			pfvm1.exit();
+
+			/*
+			 * Summary table row update after inserting the new rows in
+			 * portfolio value table
+			 */
+			PortSummaryTableManager pstm2 = new PortSummaryTableManager();
+			pstm2.setup();
+			pstm2.BulkUpdateSummaryRecords(portName, Start_date,end_date);
+			pstm2.exit();
+
+			/*
+			 * Change in index calculation and update each row on the date in
+			 * portfolio value table
+			 */
+			PortfolioValueManager pfvm2 = new PortfolioValueManager();
+			pfvm2.setup();
+			pfvm2.insertIndexinEachRow(portName,Start_date,end_date);
+			pfvm2.exit();
+
+			/*
+			 * the whole cycle will finish here from portfolio table to summary
+			 * table to portfolio value table data insert and updates
+			 */
+			
+			Gson gson = new Gson();
+			System.out.println("Json output: " + gson.toJson("Successfull"));
+			return_string = gson.toJson("Successfull");
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Exception in Updating: " + e);
+		}
+
+		return return_string;
+	}
+	
 	@POST
 	@Produces("application/json")
 	@Consumes("application/json")

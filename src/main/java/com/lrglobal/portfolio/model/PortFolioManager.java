@@ -145,15 +145,15 @@ public class PortFolioManager {
     	ArrayList<PortFolio> rslt=(ArrayList<PortFolio>) query.getResultList();
     	PortFolio portFolio=new PortFolio();
     	double cash_NumShare=calculateShare(rslt);
-    	
+    	//double 
     	if(cash_NumShare>0){
     		portFolio.setSign(sell);
     		portFolio.setNumber_of_share(cash_NumShare);
     	}
     	else{
     		portFolio.setSign(buy);
-    		cash_NumShare=0-cash_NumShare;
-    		portFolio.setNumber_of_share(cash_NumShare);
+    		double total=0-cash_NumShare;
+    		portFolio.setNumber_of_share(total);
     	}
     	
     	portFolio.setCurrent_price(Cashcurrent_price);
@@ -166,11 +166,13 @@ public class PortFolioManager {
     	Query queryPort=session.createQuery(SQL_QUERY);
     	ArrayList<PortFolio> rsltport=(ArrayList<PortFolio>) queryPort.getResultList();
     	if(rsltport.size()>0){
-    		rsltport.get(0).setNumber_of_share(cash_NumShare);
+    		
     		if(cash_NumShare>0){
+    			rsltport.get(0).setNumber_of_share(cash_NumShare);
     			rsltport.get(0).setSign(sell);
     		}
     		else{
+    			rsltport.get(0).setNumber_of_share(0-cash_NumShare);
     			rsltport.get(0).setSign(buy);
     		}
     		session.update(rsltport.get(0));

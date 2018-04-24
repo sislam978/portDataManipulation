@@ -33,6 +33,8 @@
       <mapping class="com.lrglobal.portfolio.model.PriceTable"/>
       <mapping class="com.lrglobal.portfolio.model.TickerTable"/>
       
+      <mapping class="com.lrglobal.portfolio.model.PortfolioNameTable"/>
+      
       
   </session-factory>
 </hibernate-configuration>

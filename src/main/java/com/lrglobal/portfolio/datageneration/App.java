@@ -64,13 +64,15 @@ public class App
     		}
     		//portfolio summary table data insert
     		else if(command.equalsIgnoreCase("pfsi")){
+    			System.out.println("Insert portName to generate summary table for the port:");
+    			String portName=input.nextLine();
     			System.out.println("Take startdate with yyyy-MM-dd format:");
     			String startdate = input.nextLine();
     			System.out.println("Take enddate with yyyy-MM-dd format:");
     			String enddate = input.nextLine();
     			PortSummaryTableManager portmanager=new PortSummaryTableManager();
     			portmanager.setup();
-    			portmanager.Insert(startdate,enddate);
+    			portmanager.Insert(portName,startdate,enddate);
     			portmanager.exit();
     		}
     		// text export from summary table data //need to change the method for all possible outputs

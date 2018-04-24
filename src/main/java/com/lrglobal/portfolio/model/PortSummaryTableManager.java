@@ -74,6 +74,8 @@ public class PortSummaryTableManager {
 			} else {
 				if (rslt.get(j).getSign().equals("BUY")) {
 					tickermap.put(rslt.get(j).getTicker(), rslt.get(j).getNumber_of_share());
+				} else {
+					tickermap.put(rslt.get(j).getTicker(), 0 - rslt.get(j).getNumber_of_share());
 				}
 			}
 		}
@@ -109,12 +111,9 @@ public class PortSummaryTableManager {
 	}
 
 	// method for bulk insert for all ports at a time
-	public void Insert(String startdate, String enddate) throws SQLException, ParseException {
+	public void Insert(String portName, String startdate, String enddate) throws SQLException, ParseException {
 		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-
-		Query query = session.getNamedQuery("getAllPortName");
-		ArrayList<PortFolio> portname = (ArrayList<PortFolio>) query.getResultList();
+		
 
 		// format the dates for calendar doing for loop
 		SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
@@ -126,50 +125,111 @@ public class PortSummaryTableManager {
 		Calendar end = Calendar.getInstance();
 		end.setTime(EndDate);
 
+		/*
+		 * prev date for considering the summary records of previous date
+		 */
 		for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
 			// Do your job here with `date`.
 			String UptoendDate = input_format.format(date);
+			
+			Calendar prev = Calendar.getInstance();
+			prev.setTime(dateStart);
+			prev.add(Calendar.DATE, -1); // number of days to add
+			String prev_date = input_format.format(prev.getTime());
+			session.beginTransaction();
 
-			for (int i = 0; i < portname.size(); i++) {
+			Query queryPort = session.getNamedQuery("getAllFromProvidedRange").setParameter("q_portName", portName)
+					.setParameter("q_startdate", startdate).setParameter("q_enddate", UptoendDate);
+			ArrayList<PortFolio> rslt = (ArrayList<PortFolio>) queryPort.getResultList();
 
-				Query queryPort = session.getNamedQuery("getAllFromProvidedRange")
-						.setParameter("q_portName", portname.get(i).getPortfoli_name())
-						.setParameter("q_startdate", startdate).setParameter("q_enddate", UptoendDate);
-				ArrayList<PortFolio> rslt = (ArrayList<PortFolio>) queryPort.getResultList();
+			System.out.println("size array of query for certain port: " + rslt.size());
+			Map<String, Double> tickermap = new HashMap<String, Double>();
+			Map<String, String> signMap = new HashMap<String, String>();
+			/*
+			 * calculating weighted sum of quantity an mapping with ticker
+			 */
+			tickermap = gettickerValuesForSinglePort(tickermap, rslt);
+			//Map<String,String> signmap=new HashMap<String,String>();
+			for (Map.Entry<String, Double> entry : tickermap.entrySet()) {
+				if(entry.getValue()<0){
+					signMap.put(entry.getKey(),"SELL");
+				}
+				else{
+					signMap.put(entry.getKey(), "BUY");
+				}
+			}
 
-				System.out.println("size array of query for certain port: " + rslt.size());
-				Map<String, Double> tickermap = new HashMap<String, Double>();
-				/*
-				 * calculating weighted sum of quantity an mapping with ticker
-				 */
-				tickermap = gettickerValuesForSinglePort(tickermap, rslt);
-				System.out.println("size tickerMap : " + tickermap.size());
-				/*
-				 * create a map for portfolio value with ticker
-				 */
+			System.out.println("size tickerMap : " + tickermap.size());
+			/*
+			 * create a map for portfolio value with ticker
+			 */
 
-				Map<String, Double> MapportfolioValue = new HashMap<String, Double>();
-				Map<String, Double> MapCurrentPrice = new HashMap<String, Double>();
+			Map<String, Double> MapportfolioValue = new HashMap<String, Double>();
+			Map<String, Double> MapCurrentPrice = new HashMap<String, Double>();
 
-				/*
-				 * calculate the cost price
-				 */
-				Map<String, Double> MapCostPrice = new HashMap<String, Double>();
-				String portName = portname.get(i).getPortfoli_name();
-				MapCostPrice = calculateCostprice(tickermap, startdate, UptoendDate, portName);
+			/*
+			 * calculate the cost price
+			 */
+			Map<String, Double> MapCostPrice = new HashMap<String, Double>();
 
-				/*
-				 * get current price and calculate portfolio_value
-				 */
-				MapCurrentPrice = calculateCurrentprice(tickermap, UptoendDate);
-				MapportfolioValue = calculatePorfolioValue(MapCurrentPrice, MapCostPrice, tickermap);
+			MapCostPrice = calculateCostprice(tickermap, startdate, UptoendDate, portName);
 
-				/*
-				 * This is the insertion code for port summary table;
-				 */
-				for (Map.Entry<String, Double> entry : tickermap.entrySet()) {
+			/*
+			 * get current price and calculate portfolio_value
+			 */
+			MapCurrentPrice = calculateCurrentprice(tickermap, UptoendDate);
+			MapportfolioValue = calculatePorfolioValue(MapCurrentPrice, MapCostPrice, tickermap);
+
+			/*
+			 * This is the insertion code for port summary table;
+			 */
+
+			Query prev_records = session.getNamedQuery("getprevRecordsSummary").setParameter("q_portName", portName)
+					.setParameter("q_date", prev_date);
+
+			ArrayList<PortSummaryTable> prev_daySummary = (ArrayList<PortSummaryTable>) prev_records.getResultList();
+			Map<Integer,Integer> indexList=new HashMap<Integer,Integer>();
+			int flag = 0;
+			
+			for (Map.Entry<String, Double> entry : tickermap.entrySet()) {
+				flag = 0;
+				for (int k = 0; k < prev_daySummary.size(); k++) {
+
+					if (entry.getKey().equals((prev_daySummary.get(k).getTicker()))) {
+						indexList.put(k,k);
+						flag = 1;
+						String ticker = prev_daySummary.get(k).getTicker();
+						double quantity = tickermap.get(prev_daySummary.get(k).getTicker());
+						PortSummaryTable portSummary = new PortSummaryTable();
+						portSummary.setPort_name(portName);
+						portSummary.setTicker(ticker);
+						double CostPrice =0;
+						double t_quantity = prev_daySummary.get(k).getShare_quantity() + quantity;
+						if(signMap.get(ticker).equals("SELL")){
+							CostPrice=prev_daySummary.get(k).getCost_price();
+						
+						}
+						else{
+							CostPrice = (quantity * MapCostPrice.get(ticker)+ 
+									prev_daySummary.get(k).getShare_quantity() * prev_daySummary.get(k).getCost_price())/ t_quantity;
+						}
+								
+						double PorfolioValue = MapCurrentPrice.get(ticker) * t_quantity;
+
+						portSummary.setShare_quantity(t_quantity);
+						portSummary.setSource_date(UptoendDate);
+						portSummary.setCost_price(CostPrice);
+						portSummary.setCurrent_price(MapCurrentPrice.get(ticker));
+						portSummary.setPortfoli_value(PorfolioValue);
+						portSummary.setDelete_flag(0);
+						// save method of hibernate
+						session.save(portSummary);
+					} 
+				}
+				if (flag == 0) {
+					
 					PortSummaryTable portSummary = new PortSummaryTable();
-					portSummary.setPort_name(portname.get(i).getPortfoli_name());
+					portSummary.setPort_name(portName);
 					portSummary.setTicker(entry.getKey());
 					portSummary.setShare_quantity(entry.getValue());
 					portSummary.setSource_date(UptoendDate);
@@ -180,11 +240,26 @@ public class PortSummaryTableManager {
 					// save method of hibernate
 					session.save(portSummary);
 				}
-
 			}
+			for(int m=0;m<prev_daySummary.size();m++){
+				if(!indexList.containsKey(m)){
+					PortSummaryTable portSummary = new PortSummaryTable();
+					portSummary.setPort_name(portName);
+					portSummary.setTicker(prev_daySummary.get(m).getTicker());
+					portSummary.setShare_quantity(prev_daySummary.get(m).getShare_quantity());
+					portSummary.setSource_date(UptoendDate);
+					portSummary.setCost_price(prev_daySummary.get(m).getCost_price());
+					portSummary.setCurrent_price(prev_daySummary.get(m).getCurrent_price());
+					portSummary.setPortfoli_value(prev_daySummary.get(m).getPortfoli_value());
+					portSummary.setDelete_flag(0);
+					// save method of hibernate
+					session.save(portSummary);
+				}
+			}
+			session.getTransaction().commit();
+			
 		}
 
-		session.getTransaction().commit();
 		session.close();
 	}
 
@@ -267,19 +342,17 @@ public class PortSummaryTableManager {
 					.setParameter("q_enddate", uptoendDate).setParameter("q_portName", portName);
 			ArrayList<PortFolio> rsltCost = (ArrayList<PortFolio>) queryCostPrice.getResultList();
 			System.out.println("array size for cost price data from port table: " + rsltCost.size());
-			
+
 			double cost_price = getCostpriceSinglePort(rsltCost);
 			if (!MapCostPrice.containsKey(entry.getKey())) {
-				if(entry.getKey().equals("CASH")){
+				if (entry.getKey().equals("CASH")) {
 					MapCostPrice.put(entry.getKey(), 1.0);
-				}
-				else{
+				} else {
 					MapCostPrice.put(entry.getKey(), cost_price);
 				}
-					
+
 			}
-			
-			
+
 		}
 		session.getTransaction().commit();
 		session.close();
@@ -313,7 +386,7 @@ public class PortSummaryTableManager {
 		ArrayList<PortSummaryTable> rslt = (ArrayList<PortSummaryTable>) query.getResultList();
 
 		String SQL_QUERY = "select u from PortfolioValue u where u.portName='" + portName + "' and u.source_date='"
-				+ src_date + "'";
+				+ src_date + "' and u.delete_flag<>1";
 		Query queryPortValue = session.createQuery(SQL_QUERY);
 		ArrayList<PortfolioValue> portRslt = (ArrayList<PortfolioValue>) queryPortValue.getResultList();
 		double portValueSum = portRslt.get(0).getPortfolio_value();
@@ -326,23 +399,26 @@ public class PortSummaryTableManager {
 		session.getTransaction().commit();
 		session.close();
 	}
-/*
- * Bulk calculation for certain date range an update portfolio records with inserting weight in portfolio column value
- */
-	public void BulkUpdateSummaryRecords(String portName,String from_date, String to_date) throws ParseException{
+
+	/*
+	 * Bulk calculation for certain date range an update portfolio records with
+	 * inserting weight in portfolio column value
+	 */
+	public void BulkUpdateSummaryRecords(String portName, String from_date, String to_date) throws ParseException {
 		SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
 		Date dateStart = input_format.parse(from_date);
 		Date EndDate = input_format.parse(to_date);
-		
+
 		Calendar start = Calendar.getInstance();
 		start.setTime(dateStart);
 		Calendar end = Calendar.getInstance();
 		end.setTime(EndDate);
 		for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
 			String src_date = input_format.format(date);
-			rowUpdateWeightInPortfolio(portName,src_date);
+			rowUpdateWeightInPortfolio(portName, src_date);
 		}
 	}
+
 	/*
 	 * get portfolio summary table data under each port name and certain date
 	 */
@@ -392,7 +468,8 @@ public class PortSummaryTableManager {
 	/*
 	 * CASH ticker row insert in summary table
 	 */
-	public void inserRowInSummaryTickerWise(String ticker, String portName,String from_date,String to_date) throws ParseException {
+	public void inserRowInSummaryTickerWise(String ticker, String portName, String from_date, String to_date)
+			throws ParseException {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
@@ -401,31 +478,30 @@ public class PortSummaryTableManager {
 		Query query = session.createQuery(SQL_QUERY);
 		ArrayList<PortFolio> rslt = (ArrayList<PortFolio>) query.getResultList();
 		Map<String, Double> datewiseMap = new HashMap<String, Double>();
-		
-		
+
 		SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
 		Date dateStart = input_format.parse(from_date);
 		Date EndDate = input_format.parse(to_date);
-		
+
 		Calendar start = Calendar.getInstance();
 		start.setTime(dateStart);
 		Calendar end = Calendar.getInstance();
 		end.setTime(EndDate);
-		
+
 		for (int i = 0; i < rslt.size(); i++) {
 
 			// double curr_price=rslt.get(i).getCurrent_price();
 			// double quantity=rslt.get(i).getNumber_of_share();
 			// double portfolioValue=
 			String sign = rslt.get(i).getSign();
-			
+
 			if (datewiseMap.containsKey(rslt.get(i).getSource_date())) {
 				double quantitySum = datewiseMap.get(rslt.get(i).getSource_date());
 				if (sign.equals("BUY")) {
 					quantitySum += rslt.get(i).getNumber_of_share();
 				} else {
 					quantitySum -= rslt.get(i).getNumber_of_share();
-					
+
 				}
 				datewiseMap.put(rslt.get(i).getSource_date(), quantitySum);
 			} else {
@@ -440,40 +516,41 @@ public class PortSummaryTableManager {
 			}
 
 		}
-		double initialvalue=datewiseMap.get(rslt.get(0).getSource_date());
-		int k=0;
-		double val=0;
+		double initialvalue = datewiseMap.get(rslt.get(0).getSource_date());
+		int k = 0;
+		double val = 0;
 		/*
-		 * calculating weight so that the summation will work from the beging of the date for a ticker
+		 * calculating weight so that the summation will work from the beging of
+		 * the date for a ticker
 		 */
-        TreeMap<String, Double> sorted = new TreeMap<>();
-        
-        // Copy all data from hashMap into TreeMap
-        sorted.putAll(datewiseMap);
-        
+		TreeMap<String, Double> sorted = new TreeMap<>();
+
+		// Copy all data from hashMap into TreeMap
+		sorted.putAll(datewiseMap);
+
 		for (Map.Entry<String, Double> entry : sorted.entrySet()) {
-			if(k==0){
+			if (k == 0) {
 				k++;
 				continue;
 			}
-			initialvalue+=entry.getValue();
+			initialvalue += entry.getValue();
 			sorted.put(entry.getKey(), initialvalue);
 		}
-		
+
 		for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
 			String src_date = input_format.format(date);
-			if(!sorted.containsKey(src_date)){
+			if (!sorted.containsKey(src_date)) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(date);
 				cal.add(Calendar.DATE, -1);
-				date=cal.getTime();
-				String prev_date=input_format.format(date);
+				date = cal.getTime();
+				String prev_date = input_format.format(date);
 				sorted.put(src_date, sorted.get(prev_date));
 			}
 		}
 		Map<String, Double> costpriceMap = new HashMap<String, Double>();
 		double currentprice = 0;
-		//double costPriceT = 0;
+		// double costPriceT = 0;
 		Map<String, Double> currentpriceMap = new HashMap<String, Double>();
 		// for calculating cost price selecting date wise values of port from
 		// rslt array
@@ -486,8 +563,8 @@ public class PortSummaryTableManager {
 				}
 			}
 			double costprice = getCostpriceSinglePort(costcalArray);
-			if(costprice<=0) {
-				costprice=1;
+			if (costprice <= 0) {
+				costprice = 1;
 			}
 			if (!costpriceMap.containsKey(entry.getKey())) {
 				costpriceMap.put(entry.getKey(), costprice);
@@ -508,24 +585,23 @@ public class PortSummaryTableManager {
 			}
 
 		}
-		Map<String,Double> portValues=new HashMap<String,Double>();
-		portValues=calculatePorfolioValue(currentpriceMap,costpriceMap,sorted);
-		for(Map.Entry<String, Double> entry : sorted.entrySet()){
-			PortSummaryTable p_summary=new PortSummaryTable();
+		Map<String, Double> portValues = new HashMap<String, Double>();
+		portValues = calculatePorfolioValue(currentpriceMap, costpriceMap, sorted);
+		for (Map.Entry<String, Double> entry : sorted.entrySet()) {
+			PortSummaryTable p_summary = new PortSummaryTable();
 			p_summary.setPort_name(portName);
 			p_summary.setTicker(ticker);
 			p_summary.setSource_date(entry.getKey());
 			p_summary.setShare_quantity(entry.getValue());
-			if(!costpriceMap.get(entry.getKey()).isNaN()){
+			if (!costpriceMap.get(entry.getKey()).isNaN()) {
 				p_summary.setCost_price(costpriceMap.get(entry.getKey()));
-			}
-			else{
+			} else {
 				p_summary.setCost_price(1.0);
 			}
-			if(!currentpriceMap.get(entry.getKey()).isNaN()){
+			if (!currentpriceMap.get(entry.getKey()).isNaN()) {
 				p_summary.setCurrent_price(currentpriceMap.get(entry.getKey()));
 			}
-			
+
 			p_summary.setPortfoli_value(portValues.get(entry.getKey()));
 			p_summary.setDelete_flag(0);
 			session.save(p_summary);
@@ -535,47 +611,48 @@ public class PortSummaryTableManager {
 		session.getTransaction().commit();
 		session.close();
 	}
-	
-	/*
-	 * after inserting the newly cashrow, make delete flag on all the records from summary table on that date and re calculate all the 
-	 * things for the date an dinsert new records on summary on that date
-	 */
-	 public void summarytableDataDropAndInsert(String port_name, String d_date) throws ParseException, SQLException {
-			// TODO Auto-generated method stub
-		 Session session = sessionFactory.openSession();
-		 session.beginTransaction();
-		
-		 String SQL_QUERY = "select u from PortSummaryTable u where u.port_name='" + port_name + "' and u.source_date='"
-					+ d_date + "' and u.delete_flag<>1";
-		 Query query =session.createQuery(SQL_QUERY);
-		 ArrayList<PortSummaryTable> rslt=(ArrayList<PortSummaryTable>) query.getResultList();
-		 if(rslt.size()>0){
-			 for(int i=0;i<rslt.size();i++){
-				 rslt.get(i).setDelete_flag(1);
-				 session.update(rslt.get(i));
-			 }
-		 }
-		 session.getTransaction().commit();
-		 session.close();
-		 
-		 //callforSummarydataInsert(port_name,d_date);
-		}
-	 
-	 public ArrayList<PortSummaryTable> prev_datePortSummary(String portName,String prev_date){
-		 Session session=sessionFactory.openSession();
-		 session.beginTransaction();
-		 
-		String SQL_QUERY = "select u from PortSummaryTable u where u.port_name='" + portName
-					+ "' and u.source_date='" + prev_date + "' and u.delete_flag<>1";
 
+	/*
+	 * after inserting the newly cashrow, make delete flag on all the records
+	 * from summary table on that date and re calculate all the things for the
+	 * date an dinsert new records on summary on that date
+	 */
+	public void summarytableDataDropAndInsert(String port_name, String start_date,String end_date) throws ParseException, SQLException {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		String SQL_QUERY = "select u from PortSummaryTable u where u.port_name='" + port_name + "' and u.source_date>='"
+				+ start_date + "' and u.source_date<='"+ end_date +"' and u.delete_flag<>1";
 		Query query = session.createQuery(SQL_QUERY);
-		ArrayList<PortSummaryTable> rslt=(ArrayList<PortSummaryTable>)query.getResultList();
-		
+		ArrayList<PortSummaryTable> rslt = (ArrayList<PortSummaryTable>) query.getResultList();
+		if (rslt.size() > 0) {
+			for (int i = 0; i < rslt.size(); i++) {
+				rslt.get(i).setDelete_flag(1);
+				session.update(rslt.get(i));
+			}
+		}
 		session.getTransaction().commit();
 		session.close();
-		
+
+		// callforSummarydataInsert(port_name,d_date);
+	}
+
+	public ArrayList<PortSummaryTable> prev_datePortSummary(String portName, String prev_date) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		String SQL_QUERY = "select u from PortSummaryTable u where u.port_name='" + portName + "' and u.source_date='"
+				+ prev_date + "' and u.delete_flag<>1";
+
+		Query query = session.createQuery(SQL_QUERY);
+		ArrayList<PortSummaryTable> rslt = (ArrayList<PortSummaryTable>) query.getResultList();
+
+		session.getTransaction().commit();
+		session.close();
+
 		return rslt;
-		 
-	 }
+
+	}
 
 }

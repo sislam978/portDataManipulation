@@ -54,7 +54,14 @@ import javax.persistence.Table;
 			query ="CALL getCurrentpriceFromPriceTable(:q_tickerName,:q_date)",
 			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
 			resultClass=PriceTable.class
-			)
+			),
+	@NamedNativeQuery(
+					name="getprevRecordsSummary",
+					query ="CALL getprevRecordsSummary(:q_portName,:q_date)",
+					hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
+					resultClass=PortSummaryTable.class
+					)
+	
 })
 @Entity
 @Table(name="portfolio_summary_table")

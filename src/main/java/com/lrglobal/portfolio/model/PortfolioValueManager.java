@@ -103,7 +103,7 @@ public class PortfolioValueManager {
 		return rslt;
 	}
 
-	public void insertIndexinEachRow(String portName,String d_date,String source_date) throws ParseException {
+	public void insertIndexinEachRow(String portName,String source_date,String end_date) throws ParseException {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
@@ -111,14 +111,14 @@ public class PortfolioValueManager {
 		 * Taking prev date in the output
 		 */
 		SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
-		Date dd_Date = input_format.parse(d_date);
+		Date End_Date = input_format.parse(end_date);
 		Date dateStart = input_format.parse(source_date);
 
 		Calendar start = Calendar.getInstance();
 		start.setTime(dateStart);
 
 		Calendar end = Calendar.getInstance();
-		end.setTime(dd_Date);
+		end.setTime(End_Date);
 
 		for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
 			String src_date = input_format.format(date);
@@ -263,17 +263,36 @@ public class PortfolioValueManager {
 		session.close();
 		return rslt;
 	}
+	public Map<String,Double> portValuesForChart(String portName, String start_date,String end_date){
+		
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		Map<String, Double> rslt = new HashMap<String, Double>();
+		Query query = session.getNamedQuery("getALLPortValueDataForChart").setParameter("q_portName", portName)
+				.setParameter("q_sdate", start_date).setParameter("q_edate", end_date);
+		ArrayList<PortfolioValue> rsltList = (ArrayList<PortfolioValue>) query.getResultList();
+
+		for (int i = 0; i < rsltList.size(); i++) {
+			if (!rslt.containsKey(rsltList.get(i).getSource_date())) {
+				rslt.put(rsltList.get(i).getSource_date(), rsltList.get(i).getPortfolio_value());
+			}
+		}
+
+		session.getTransaction().commit();
+		session.close();
+		return rslt;
+	}
 	
 	/*
 	 * portfolio value table select data to on delete flag and call insertion method of portfolio value table
 	 */
-		public void deleteandReInsertonDate(String port_name, String d_date, String end_date) throws ParseException {
+		public void deleteandReInsertonDate(String port_name, String start_date, String end_date) throws ParseException {
 			// TODO Auto-generated method stub
 			Session session=sessionFactory.openSession();
 			session.beginTransaction();
 			
-			String SQL_QUERY="select u from PortfolioValue u where u.portName='" + port_name + "' and u.source_date='"
-					+ d_date + "'";
+			String SQL_QUERY="select u from PortfolioValue u where u.portName='" + port_name + "' and u.source_date>='"
+					+ start_date + "' and u.source_date<= '"+ end_date +"' and u.delete_flag<>1";
 			Query query =session.createQuery(SQL_QUERY);
 			
 			ArrayList<PortfolioValue> rslt=(ArrayList<PortfolioValue>)query.getResultList();

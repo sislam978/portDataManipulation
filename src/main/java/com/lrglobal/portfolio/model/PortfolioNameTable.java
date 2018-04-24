@@ -22,6 +22,9 @@ public class PortfolioNameTable {
 	@Column(name="user_name")
 	private String UserName;
 
+	@Column(name="created_on")
+	private String created_on;
+	
 	public long getPortNameId() {
 		return portNameId;
 	}
@@ -45,13 +48,23 @@ public class PortfolioNameTable {
 	public void setUserName(String userName) {
 		UserName = userName;
 	}
+	
+
+	public String getCreated_on() {
+		return created_on;
+	}
+
+	public void setCreated_on(String created_on) {
+		this.created_on = created_on;
+	}
 
 	@Override
 	public String toString() {
 		return "PortfolioNameTable [portNameId=" + portNameId + ", portname=" + portname + ", UserName=" + UserName
-				+ ", getPortNameId()=" + getPortNameId() + ", getPortname()=" + getPortname() + ", getUserName()="
-				+ getUserName() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-				+ super.toString() + "]";
+				+ ", created_on=" + created_on + ", getPortNameId()=" + getPortNameId() + ", getPortname()="
+				+ getPortname() + ", getUserName()=" + getUserName() + ", getCreated_on()=" + getCreated_on()
+				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString()
+				+ "]";
 	}
 	
 	
