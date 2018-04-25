@@ -88,6 +88,7 @@ public class PortFolioManager {
     				if(list.get(0).getCost_price()!=null && rslt.get(i).getCost_price()!=null){
     					double weightedsum=list.get(0).getNumber_of_share()*list.get(0).getCost_price()
             					+rslt.get(i).getNumber_of_share()*rslt.get(i).getCost_price();
+    					
     					double avgCostPrice=weightedsum/quantity;
     					list.get(0).setCost_price(avgCostPrice);
     				}
@@ -102,6 +103,9 @@ public class PortFolioManager {
     			}
     		}
     		else{
+    			if(pp.getTicker().equals("CASH")){
+    				pp.setCreated_by(1);
+    			}
     			pp.setDelete_flag(0);
     			session.save(pp);
     		}
