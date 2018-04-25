@@ -326,5 +326,31 @@ public class PortFolioManager {
     	session.close();
     	return rslt.get(0).getSource_date();
     }
+    public ArrayList<PortFolio> sendDesiredDateData(String portName,String desired_date){
+    	
+    	Session session=sessionFactory.openSession();
+    	session.beginTransaction();
+    	ArrayList<PortFolio> rslt=new ArrayList<PortFolio>();
+    	String SQL_QUERY= "select u from PortFolio u where u.portfoli_name='" + portName + "' and u.source_date='"+desired_date+"' and u.delete_flag<>1";
+    	
+    	Query query =session.createQuery(SQL_QUERY);
+    	rslt=(ArrayList<PortFolio>)query.getResultList();
+    	ArrayList<PortFolio> vv_rslt=new ArrayList<PortFolio>();
+    	for(int i=0;i<rslt.size();i++){
+    		if(rslt.get(i).getTicker().equals("CASH")){
+    			
+    			if(rslt.get(i).getCreated_by()!=null){
+    				vv_rslt.add(rslt.get(i));
+    			}
+    			
+    		}
+    		else if(!rslt.get(i).getTicker().equals("CASH")){
+				vv_rslt.add(rslt.get(i));
+			}
+    	}
+    	session.getTransaction().commit();
+    	session.close();
+    	return vv_rslt;
+    }
 
 }

@@ -374,6 +374,37 @@ public class PortFolioService {
 
 		return return_string;
 	}
+	@POST
+	@Produces("application/json")
+	@Consumes("application/json")
+	@Path("/portfolioTableData")
+	public String portFolioValueDataSend(String json){
+		String return_String=null;
+		try{
+			String[] primaryData = json.split(",|:");
+			for (int i = 0; i < primaryData.length; i++) {
+				System.out.println(primaryData[i]);
+			}
+			String portName=primaryData[1].substring(1, primaryData[1].length() - 1);
+			String desired_date=primaryData[3].substring(1, primaryData[3].length() - 2);
+			
+			PortFolioManager pfm=new PortFolioManager();
+			pfm.setup();
+			ArrayList<PortFolio>rslt=pfm.sendDesiredDateData(portName, desired_date);
+			pfm.exit();
+			if(rslt.isEmpty()){
+				return_String="No data found on that date.";
+			}
+			else{
+				Gson gson=new Gson();
+				return_String= gson.toJson(rslt);
+			}
+			System.out.println(return_String);
+		}catch(Exception e){
+			System.out.println("Showing exception due to: "+e);
+		}
+		return return_String;
+	}
 	
 	@POST
 	@Produces("application/json")
