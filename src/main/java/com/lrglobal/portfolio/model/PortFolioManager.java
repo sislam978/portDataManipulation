@@ -105,7 +105,9 @@ public class PortFolioManager {
     			pp.setDelete_flag(0);
     			session.save(pp);
     		}
-    		
+    		/*
+    		 * using the snippet for batch insertion
+    		 */
     		if(i%250==0){
     			session.flush();
     			session.clear();
@@ -137,15 +139,27 @@ public class PortFolioManager {
     	
     	Session session =sessionFactory.openSession();
     	session.beginTransaction();
-    	
+    	/*
+    	 * create a query for taking in consideration of those portfolio records which have parameters as same as 
+    	 * the function parameters 
+    	 */
     	Query query=session.getNamedQuery("getAllOndatePortfolio")
     			.setParameter("q_portName",port_name)
     			.setParameter("q_date", d_date);
     	
     	ArrayList<PortFolio> rslt=(ArrayList<PortFolio>) query.getResultList();
     	PortFolio portFolio=new PortFolio();
+    	/*
+    	 * sending the considered records to the function to calculate Cash quantity  
+    	 */
     	double cash_NumShare=calculateShare(rslt);
     	//double 
+    	/*
+    	 * The conditional statement check whether the cash number poitive or negative
+    	 * if poitive then we have to set the CASH Ticker record sign SELL
+    	 * If negative then set BUY and we have to set number of share always poitive 
+    	 * the sign will decide the record whether it is buy or sell
+    	 */
     	if(cash_NumShare>0){
     		portFolio.setSign(sell);
     		portFolio.setNumber_of_share(cash_NumShare);
@@ -155,19 +169,27 @@ public class PortFolioManager {
     		double total=0-cash_NumShare;
     		portFolio.setNumber_of_share(total);
     	}
-    	
+    	/*
+    	 * setting other attributes from defined constant and function parameters
+    	 * CASH ticker current price , cost price are set as 1 and cash ticker is CASH 
+    	 */
     	portFolio.setCurrent_price(Cashcurrent_price);
     	portFolio.setCost_price(Cashcost_price);
     	portFolio.setTicker(cashTicker);
     	portFolio.setPortfoli_name(port_name);
     	portFolio.setSource_date(d_date);
+    	/*
+    	 * Now we have to balance the cash record for that date if there have any records previously on the date 
+    	 * If the data found, update the quantity and sign attribute of the object and then update the records in
+    	 * the database. If not then trigger directly save method from hibernate.
+    	 */
     	String SQL_QUERY="select u from PortFolio u where u.portfoli_name='" + port_name + 
 				"' and u.ticker='"+cashTicker+"' and u.source_date='"+d_date+"' and u.created_by is null and u.delete_flag<>1";
     	Query queryPort=session.createQuery(SQL_QUERY);
     	ArrayList<PortFolio> rsltport=(ArrayList<PortFolio>) queryPort.getResultList();
     	if(rsltport.size()>0){
-    		
     		if(cash_NumShare>0){
+    			
     			rsltport.get(0).setNumber_of_share(cash_NumShare);
     			rsltport.get(0).setSign(sell);
     		}
@@ -197,6 +219,10 @@ public class PortFolioManager {
 		// TODO Auto-generated method stub
     	//double share_quantity=0;
     	double weighted_sum=0;
+    	/*
+    	 * Here according to the buy sell  sign the summation of the total quantity will be calculated 
+    	 * for cash ticker
+    	 */
     	for(int i=0;i<rslt.size();i++){
     		if(rslt.get(i).getSign().equals(buy)){
     			weighted_sum += (rslt.get(i).getCost_price()*rslt.get(i).getNumber_of_share());
@@ -208,11 +234,17 @@ public class PortFolioManager {
 		return weighted_sum;
 	}
     
+    /*
+     * The method is create for cash update for whole table 
+     * As we take all the distinct date from the query and start looping through the dates for the portfolio.
+     * in each loop iteration the cashrow_insert method will call then insert the calculated cash with full records for that date.
+     */
     public void bulkInsertForCashTicker(String portName) throws ParseException, SQLException{
     	Session session= sessionFactory.openSession();
     	session.beginTransaction();
     	
-    	Query queryDate = session.getNamedQuery("getDistinctDate");
+    	Query queryDate = session.getNamedQuery("getDistinctDate")
+    			.setParameter("q_portName", portName);
     	ArrayList<PortFolio> dates=(ArrayList<PortFolio>) queryDate.getResultList();
     	
     	for(int i=0;i<dates.size();i++){
@@ -223,7 +255,10 @@ public class PortFolioManager {
     	session.close();
     }
     /*
-     * Api requested data insertion
+     * Api requested data insertion. API will send the record which need to insert. 
+     * First check whether the intended record is already stored in database or not. the query here check with provided constraints
+     * in the parameters of the query. 
+     * If the query result is 0 the save method will call to save and return a successful response from the api calling method
      */
     public String insertRecordsApi(PortFolio rslt) throws ParseException, SQLException{
     	Session session =  sessionFactory.openSession();

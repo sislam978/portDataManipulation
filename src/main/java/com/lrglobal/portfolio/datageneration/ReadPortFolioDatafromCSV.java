@@ -39,6 +39,9 @@ public class ReadPortFolioDatafromCSV {
 					continue;
 				}
 				PortFolio portFolio=new PortFolio();
+				/*
+				 * 0,1,2,3 .... are column numbers of CSV which are st as object attributes
+				 */
 				if(csvRecord.get(0).toString().equals("")){
 					portFolio.setTicker(null);
 				}

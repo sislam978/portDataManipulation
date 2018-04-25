@@ -25,7 +25,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 			),
 	@NamedNativeQuery(
 			name="getDistinctDate",
-			query="CALL getDistinctDate()",
+			query="CALL getDistinctDate(:q_portName)",
 			hints=	@javax.persistence.QueryHint(name = "org.hibernate.callable", value = "true"),
 			resultClass=PortFolio.class
 			),

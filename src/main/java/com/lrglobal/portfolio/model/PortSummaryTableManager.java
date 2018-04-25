@@ -57,7 +57,12 @@ public class PortSummaryTableManager {
 	}
 
 	/*
-	 * Quantity calculation for portfolio summary
+	 * Quantity calculation for portfolio summary. 
+	 * The quantity calculation is depended on buy sell sign. after getting the list of portfolio for certain date range
+	 * loop through each record and cechk whether the sign is buy or sell. if buy map will add the quantity with previous 
+	 * quantity and put it to the map for the certain ticker.
+	 * Initially map will add the ticker with quantity either positive or negative according to the sign is buy or sell.
+	 * ticker map generation completed. 
 	 */
 	public Map<String, Double> gettickerValuesForSinglePort(Map<String, Double> tickermap, ArrayList<PortFolio> rslt) {
 		for (int j = 0; j < rslt.size(); j++) {
@@ -82,7 +87,17 @@ public class PortSummaryTableManager {
 		return tickermap;
 	}
 
-	public double getCostpriceSinglePort(ArrayList<PortFolio> rslt) {
+	/*
+	 * The function is calculating cost price for certain portfolio and ticker within certain date range. 
+	 * 1.The algorithmic concept is that If the ticker has a record in portfolio with buy sign 
+	 * the weighted average wil calculate like the equation (A1W1(+-)A2W2(+-)A3W3/(W1(+-)W2(+-)W3))
+	 * 2. The plus and minus sign will be decided by buy or sell sign. BUY=positive, sell = negative
+	 * 3. Here is a critical case where if I sell any row and then buy only the quantity will be minus 
+	 * but the previous calculated price will have no impact on this and then again we buy any share 
+	 * for that ticker then the weighted average will be the (prev_cost_price * prev_calculated_quantity 
+	 * + current_cost_price * quantity)/(prev_calculated_quantity+quantity)
+	 */
+	public double getCostpriceSingleTicker(ArrayList<PortFolio> rslt) {
 		double result = 0.0;
 		double last_costprice = 0;
 		double sumQuantity = 0;
@@ -110,7 +125,23 @@ public class PortSummaryTableManager {
 		return last_costprice;
 	}
 
-	// method for bulk insert for all ports at a time
+	/*
+	 * method for Inserting new data into the summary table. Before the first loop in the method the dates are convert 
+	 * into calendar instants for iterating from the start to till end. inside the loop 
+	 * 1. Take always the previous date from the current date of the loop to calculate the summary table record elements 
+	 * 2.The query took all the records of portfolio in consideration within the startdate to till current date.
+	 * 3. create a map called tickerMap which map the ticker value and quantity from the considered records of portfolio table.
+	 * 4.From ticker Map according to the positive and negative sign the buy and sell sign set in the signmap Map<ticker,sign>  
+	 * 5.similarly calculate and generate the cost price map Map<ticker, costprice>
+	 * 6.Current price Map from price table Map<ticker, current price>
+	 * 7.Calculate portfolio value and create map for all ticker Map<ticker, portfolio_value>
+	 * Each Map will contain unique ticker and their corresponding quantity, cost price, sign, current price.
+	 * 8. now take all the previous day records from summary table for certain portfolio.
+	 * 9. now create a loop for ticker map and nested loop for previous record list. if the ticker map contains the ticker in the 
+	 * previous day records re calculate the cost price, quantity, portfolio value. the cost price will update according to buy 
+	 * sell sign. If not found in the previous day record, create a new record for that ticker and insert into the summary table.
+	 * After that the remaining records from previous day will be insert as current date records in the summary table.
+	 */
 	public void Insert(String portName, String startdate, String enddate) throws SQLException, ParseException {
 		Session session = sessionFactory.openSession();
 		
@@ -264,7 +295,12 @@ public class PortSummaryTableManager {
 	}
 
 	/*
-	 * creating map for portfolio value and calculation
+	 * creating map for portfolio value and calculation.
+	 * Here we consider the portfolio Value calculation in such a way that the ticker map, current price and cost price map 
+	 * with ticker will pass as a parameter in the function. Now if current price = 0 then multiply cost price and quantity
+	 * to calculate portfolio value for that ticker 
+	 * else multiply quantity and current price to calcualte portfolio value
+	 * then put it on a portfolio value map
 	 */
 	private Map<String, Double> calculatePorfolioValue(Map<String, Double> mapCurrentPrice,
 			Map<String, Double> MapCostPrice, Map<String, Double> tickerMap) {
@@ -296,6 +332,8 @@ public class PortSummaryTableManager {
 
 	/*
 	 * current price calculation and maping according to ticker
+	 * 1. For each ticker execute a query on the desired date to take in consideration the value of current date
+	 * 2. put it on the price map structure 
 	 */
 	private Map<String, Double> calculateCurrentprice(Map<String, Double> tickermap, String uptoendDate) {
 		// TODO Auto-generated method stub
@@ -327,6 +365,10 @@ public class PortSummaryTableManager {
 
 	/*
 	 * calculating cost price for certain date range
+	 * 1. to calculate the cost price for a ticker of a certain portname on a certain date range, execute a query 
+	 * in portfolio table and take all the records within the range of parameters 
+	 * 2. going to call the function for calculating cost price for each ticker. 
+	 * 3. for ticker CASH the cost price is intend to set as 1.00  
 	 */
 	private Map<String, Double> calculateCostprice(Map<String, Double> tickermap, String startdate, String uptoendDate,
 			String portName) {
@@ -343,7 +385,7 @@ public class PortSummaryTableManager {
 			ArrayList<PortFolio> rsltCost = (ArrayList<PortFolio>) queryCostPrice.getResultList();
 			System.out.println("array size for cost price data from port table: " + rsltCost.size());
 
-			double cost_price = getCostpriceSinglePort(rsltCost);
+			double cost_price = getCostpriceSingleTicker(rsltCost);
 			if (!MapCostPrice.containsKey(entry.getKey())) {
 				if (entry.getKey().equals("CASH")) {
 					MapCostPrice.put(entry.getKey(), 1.0);
@@ -359,6 +401,12 @@ public class PortSummaryTableManager {
 		return MapCostPrice;
 	}
 
+	/*
+	 * This method is basically for requesting api method which request with parameters , portName, ticker, and 
+	 * desired date
+	 * it will return a single day record from portfolio summary table for that ticker with corresponding ticker name.
+	 * The query is return a lone record.
+	 */
 	public ArrayList<PortSummaryTable> getSingledata(String portName, String ticker, String d_date) {
 		ArrayList<PortSummaryTable> rslt = new ArrayList<PortSummaryTable>();
 		Session session = sessionFactory.openSession();
@@ -375,7 +423,12 @@ public class PortSummaryTableManager {
 	}
 
 	/*
-	 * weight in portfolio calculation nad update each row in port summary table
+	 * weight in portfolio calculation and update each row in port summary table.
+	 * 1. for certain portname and date we execute a query to take the data from summary table into the rslt array 
+	 * 2 The we take the same parameters into consideration in portfolio value table to execute a query and take 
+	 * the portfolio value on that date
+	 * 3.equation weight in portfolio = rslt list portfolio value for certain ticker/ portfolio_value table  portfolio value on that date
+	 * 4. set the weight for the record and update the record by calling hibernate update method. 
 	 */
 	public void rowUpdateWeightInPortfolio(String portName, String src_date) {
 		Session session = sessionFactory.openSession();
@@ -403,6 +456,9 @@ public class PortSummaryTableManager {
 	/*
 	 * Bulk calculation for certain date range an update portfolio records with
 	 * inserting weight in portfolio column value
+	 * The process is noramlly if we want to update the portfolio summary table records to insert weight in portfolio then 
+	 * the provided date range in parameteres  will help to loop through the dates and the port name will help to update the 
+	 * value  for a certain date by calling the rowUpdateWeightinPortfolio
 	 */
 	public void BulkUpdateSummaryRecords(String portName, String from_date, String to_date) throws ParseException {
 		SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
@@ -421,6 +477,9 @@ public class PortSummaryTableManager {
 
 	/*
 	 * get portfolio summary table data under each port name and certain date
+	 * Again it is a method for requesting api. the api will request with a 
+	 * portname and date it will execute the query with those parameters in portfolio summary table and 
+	 * the return list of records will return to the api calling functio.
 	 */
 	public ArrayList<PortSummaryTable> getEachPortData(String port_name, String d_date) {
 		Session session = sessionFactory.openSession();
@@ -466,7 +525,14 @@ public class PortSummaryTableManager {
 	}
 
 	/*
-	 * CASH ticker row insert in summary table
+	 * Inserting data into summary table for certain ticker  of a port name within date range. 
+	 * This whole process as similar as the insertion process described earlier.
+	 * 1. point to be noted here every calculation of quantity, costprice, portfolio value, and other thing is map with date
+	 * exacly <date,costprice>, <date, portfolio_value>, <date,current_price> <date,quantity> this format
+	 * 3. +datewise map quantity map
+	 * 4.Tree map used to sort the map
+	 * 5.similarly price map, cost price map, portfolio value map
+	 * 6. after calcualting all insert new data into summary table. 
 	 */
 	public void inserRowInSummaryTickerWise(String ticker, String portName, String from_date, String to_date)
 			throws ParseException {
@@ -562,7 +628,7 @@ public class PortSummaryTableManager {
 					costcalArray.add(rslt.get(i));
 				}
 			}
-			double costprice = getCostpriceSinglePort(costcalArray);
+			double costprice = getCostpriceSingleTicker(costcalArray);
 			if (costprice <= 0) {
 				costprice = 1;
 			}
@@ -637,7 +703,10 @@ public class PortSummaryTableManager {
 
 		// callforSummarydataInsert(port_name,d_date);
 	}
-
+ /*
+  * portfolio value table dat insertion contraint 
+  * get all the previous day records fro the desired port name
+  */
 	public ArrayList<PortSummaryTable> prev_datePortSummary(String portName, String prev_date) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
