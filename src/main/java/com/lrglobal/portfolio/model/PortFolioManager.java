@@ -223,22 +223,40 @@ public class PortFolioManager {
 		// TODO Auto-generated method stub
     	//double share_quantity=0;
     	double weighted_sum=0;
+    	
     	/*
     	 * Here according to the buy sell  sign the summation of the total quantity will be calculated 
     	 * for cash ticker
     	 */
     	for(int i=0;i<rslt.size();i++){
+    		double comm=calculate_commision(rslt.get(i));
     		if(rslt.get(i).getSign().equals(buy)){
     			weighted_sum += (rslt.get(i).getCost_price()*rslt.get(i).getNumber_of_share());
+    			weighted_sum +=comm;
     		}
     		else{
     			weighted_sum-= (rslt.get(i).getCost_price()*rslt.get(i).getNumber_of_share());
+    			weighted_sum+=comm;
     		}
     	}
 		return weighted_sum;
 	}
     
-    /*
+    private double calculate_commision(PortFolio portFolio) {
+		// TODO Auto-generated method stub
+		double commision_value = 0;
+		
+		if(portFolio.getCommission()==null){
+			commision_value=0;
+		}
+		else{
+			commision_value=portFolio.getCommission()*portFolio.getNumber_of_share()*portFolio.getCost_price();
+		}
+		return commision_value;
+	}
+
+
+	/*
      * The method is create for cash update for whole table 
      * As we take all the distinct date from the query and start looping through the dates for the portfolio.
      * in each loop iteration the cashrow_insert method will call then insert the calculated cash with full records for that date.

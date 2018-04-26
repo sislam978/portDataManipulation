@@ -154,7 +154,10 @@ public class PortFolioService {
 
 			port.setSource_date(primaryData[9].substring(1, primaryData[9].length() - 1));
 
-			port.setSign(primaryData[11].substring(1, primaryData[11].length() - 2));
+			port.setSign(primaryData[11].substring(1, primaryData[11].length() - 1));
+			
+			String commision=primaryData[13].substring(1, primaryData[13].length()-2);
+			port.setCommission(Double.parseDouble(commision));
 
 			String ticker = primaryData[3].substring(1, primaryData[3].length() - 1);
 			String portName = primaryData[1].substring(1, primaryData[1].length() - 1);
