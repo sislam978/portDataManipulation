@@ -35,6 +35,9 @@
       
       <mapping class="com.lrglobal.portfolio.model.PortfolioNameTable"/>
       
+      <mapping class="com.lrglobal.portfolio.model.CorporateDeclaration"/>
+      
+      
       
   </session-factory>
 </hibernate-configuration>
