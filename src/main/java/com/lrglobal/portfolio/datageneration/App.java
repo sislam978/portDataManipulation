@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
+import com.lrglobal.portfolio.model.CorporatedeclarationManager;
 import com.lrglobal.portfolio.model.PortFolioManager;
 import com.lrglobal.portfolio.model.PortSummaryTableManager;
 import com.lrglobal.portfolio.model.PortfolioValueManager;
@@ -190,6 +191,39 @@ public class App
     			summaryMnager.setup();
     			summaryMnager.inserRowInSummaryTickerWise(ticker, portName,from_date,to_date);
     			summaryMnager.exit();
+    		}
+    		/*
+    		 * cashdividend adjustment for price change calculation in price table
+    		 */
+    		else if(command.equals("cda")){
+    			
+    			System.out.println("Enter ticker Name: ");
+    			String ticker=input.nextLine();
+    			System.out.println("Enter the desired date: ");
+    			String desired_date=input.nextLine();
+    			
+    			CorporatedeclarationManager cdm=new CorporatedeclarationManager();
+    			cdm.setup();
+    			cdm.cashDividendAdjustment(ticker,desired_date);
+    			cdm.exit();
+    		}
+    		/*
+    		 * new cash row in portfolio table for cash dividend
+    		 */
+    		else if(command.equals("cdcri")){
+    			System.out.println("Enter port Name:");
+    			String portName=input.nextLine();
+    			
+    			System.out.println("Enter Ticker Name:");
+    			String ticker=input.nextLine();
+    			
+    			System.out.println("Enter desired date:");
+    			String d_date=input.nextLine();
+    			
+    			PortFolioManager pfm=new PortFolioManager();
+    			pfm.setup();
+    			pfm.cashDividendCASHrow(portName, ticker, d_date);
+    			pfm.exit();
     		}
     	}
 //        TestTableManager testTableManager=new TestTableManager();

@@ -167,6 +167,7 @@ public class PortSummaryTableManager {
 			prev.setTime(dateStart);
 			prev.add(Calendar.DATE, -1); // number of days to add
 			String prev_date = input_format.format(prev.getTime());
+			
 			session.beginTransaction();
 
 			Query queryPort = session.getNamedQuery("getAllFromProvidedRange").setParameter("q_portName", portName)

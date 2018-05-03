@@ -104,6 +104,9 @@ public class PortFolio {
 	
 	@Column(name="delete_flag")
 	private Integer delete_flag;
+	
+	@Column(name="cash_dividend_flag")
+	private String CashDividendFlag;
 
 	public long getPortfolio_id() {
 		return portfolio_id;
@@ -258,6 +261,16 @@ public class PortFolio {
 
 	public void setDelete_flag(Integer delete_flag) {
 		this.delete_flag = delete_flag;
+	}
+
+	
+
+	public String getCashDividendFlag() {
+		return CashDividendFlag;
+	}
+
+	public void setCashDividendFlag(String cashDividendFlag) {
+		CashDividendFlag = cashDividendFlag;
 	}
 
 

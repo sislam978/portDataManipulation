@@ -1,6 +1,10 @@
 package com.lrglobal.portfolio.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Scanner;
 
 import org.hibernate.Session;
@@ -94,15 +98,22 @@ public class PriceTableManager {
 		session.close();
 	}
 
-	public void read() {
+	public ArrayList<PriceTable> getRecordsPT(String ticker,String d_date) {
 		// code to get a Data
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-
+		
+		String SQL_QUERY="select u from PriceTable u where u.price_date='" + d_date + "' and u.ticker='"+ticker+"'";
+		Query query=session.createQuery(SQL_QUERY);
+		
+		ArrayList<PriceTable> rslt= (ArrayList<PriceTable>) query.getResultList();
+		
 		session.getTransaction().commit();
 		session.close();
+		return rslt;
 	}
 
+	
 	public void addNetSell() {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -126,6 +137,55 @@ public class PriceTableManager {
 		// code to remove a Data
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
+
+		session.getTransaction().commit();
+		session.close();
+	}
+
+//	public ArrayList<PriceTable> getRecordsPTwithRange(String prev_date, String d_date) {
+//		// TODO Auto-generated method stub
+//		Session session = sessionFactory.openSession();
+//		session.beginTransaction();
+//		
+//		String SQL_QUERY="select u from PriceTable u where u.price_date<='" + d_date + "' and u.price_date>='"+ prev_date +"'";
+//		Query query=session.createQuery(SQL_QUERY);
+//		
+//		ArrayList<PriceTable> rslt= (ArrayList<PriceTable>) query.getResultList();
+//		
+//		session.getTransaction().commit();
+//		session.close();
+//		return rslt;
+//	}
+
+	public void cashdividendSetInPriceChange(ArrayList<CorporateDeclaration> rsltCD, ArrayList<PriceTable> rsltpt)
+			throws ParseException {
+		// TODO Auto-generated method stub
+
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		String cashDividend_ticker = rsltCD.get(0).getTickerName();
+		String price_ticker = rsltpt.get(0).getTicker();
+		if (cashDividend_ticker.equals(price_ticker)) {
+			SimpleDateFormat input_format = new SimpleDateFormat("yyyy-MM-dd");
+			Date dateStart = input_format.parse(rsltpt.get(0).getPrice_date());
+			Calendar prev = Calendar.getInstance();
+			prev.setTime(dateStart);
+			prev.add(Calendar.DATE, -1); // number of days to add
+			String prev_date = input_format.format(prev.getTime());
+
+			String SQL_QUERY = "select u from PriceTable u where u.price_date='" + prev_date + "' and u.ticker='"
+					+ price_ticker + "'";
+			Query query = session.createQuery(SQL_QUERY);
+
+			ArrayList<PriceTable> rslt = (ArrayList<PriceTable>) query.getResultList();
+
+			double newPriceChane = (rsltpt.get(0).getPrice() + rsltCD.get(0).getCashDividend())
+					/ rslt.get(0).getPrice();
+
+			rsltpt.get(0).setPrice_change(newPriceChane);
+			session.update(rsltpt.get(0));
+		}
 
 		session.getTransaction().commit();
 		session.close();
