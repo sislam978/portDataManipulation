@@ -334,4 +334,43 @@ public class PortfolioValueManager {
 			return Total_Gain;
 		}
 
+		public void updateRowFor_CapitalGain(String portName, String d_date){
+			Session session=sessionFactory.openSession();
+			session.beginTransaction();
+
+			String SQL_QUERY="select u from PortfolioValue u where u.portName='" + portName + "' and u.source_date='"
+					+ d_date + "' and u.delete_flag<>1";
+			
+			Query query=session.createQuery(SQL_QUERY);
+			ArrayList<PortfolioValue> rslt=(ArrayList<PortfolioValue>) query.getResultList();
+			if(!rslt.isEmpty()){
+				CapitalGainManager cgm=new CapitalGainManager();
+				cgm.setup();
+				double netCapitalGain=cgm.calculateNetCapitalGain(portName, d_date);
+				rslt.get(0).setNetCapital_gain(netCapitalGain);
+				session.update(rslt.get(0));
+			}
+			
+			session.getTransaction().commit();
+			session.close();
+		}
+		
+		public double calculateSummationOfcapitalgain(String portName, String start_date,String end_date){
+			Session session=sessionFactory.openSession();
+			session.beginTransaction();
+
+			String SQL_QUERY="select u from PortfolioValue u where u.portName='" + portName + "' and u.source_date=>'"
+					+ start_date + "' and u.source_date<='"+ end_date +"'and u.delete_flag<>1";
+			
+			Query query=session.createQuery(SQL_QUERY);
+			ArrayList<PortfolioValue> rslt=(ArrayList<PortfolioValue>) query.getResultList();
+			double sumOfCapitalGain=0;
+			for(int i=0;i<rslt.size();i++){
+				sumOfCapitalGain+=rslt.get(i).getNetCapital_gain();
+			}
+			
+			session.getTransaction().commit();
+			session.close();
+			return sumOfCapitalGain;
+		}
 }

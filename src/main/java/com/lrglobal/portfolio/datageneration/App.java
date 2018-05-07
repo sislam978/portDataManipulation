@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
+import com.lrglobal.portfolio.model.CapitalGainManager;
 import com.lrglobal.portfolio.model.CorporatedeclarationManager;
 import com.lrglobal.portfolio.model.PortFolioManager;
 import com.lrglobal.portfolio.model.PortSummaryTableManager;
@@ -225,6 +226,9 @@ public class App
     			pfm.cashDividendCASHrow(portName, ticker, d_date);
     			pfm.exit();
     		}
+    		/*
+    		 * checking calculation of net commission, net cash dividend etc
+    		 */
     		else if(command.equals("ddd")){
     			System.out.println("Enter port Name:");
     			String portName=input.nextLine();
@@ -239,6 +243,37 @@ public class App
     			pfm.setup();
     			pfm.calculateTotalCommission(portName, star_date, end_date);
     			pfm.exit();
+    		}
+    		/*
+    		 * capital gain data insert
+    		 */
+    		else if(command.equals("cgi")){
+    			System.out.println("Enter PortName: ");
+    			String portName=input.nextLine();
+    			
+    			System.out.println("Enter start date:");
+    			String start_date=input.nextLine();
+    			
+    			System.out.println("Enter end date:");
+    			String end_date=input.nextLine();
+    			
+    			CapitalGainManager cgm=new CapitalGainManager();
+    			cgm.setup();
+    			cgm.bulkInsertCapitalgain(portName, start_date, end_date);
+    			cgm.exit();
+    			
+    		}
+    		else if(command.equals("pvcgu")){
+    			System.out.println("Enter PortName: ");
+    			String portName=input.nextLine();
+    			
+    			System.out.println("Enter desired date:");
+    			String d_date=input.nextLine();
+    			
+    			PortfolioValueManager pfvm=new PortfolioValueManager();
+    			pfvm.setup();
+    			pfvm.updateRowFor_CapitalGain(portName, d_date);
+    			pfvm.exit();
     		}
     	}
 //        TestTableManager testTableManager=new TestTableManager();

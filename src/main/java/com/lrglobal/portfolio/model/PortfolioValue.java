@@ -73,6 +73,9 @@ public class PortfolioValue {
 	
 	@Column(name="portfolio_cost")
 	private Double portfolio_cost;
+	
+	@Column(name="net_capital_gain")
+	private Double netCapital_gain;
 
 	public long getPortvalueId() {
 		return portvalueId;
@@ -179,12 +182,20 @@ public class PortfolioValue {
 		this.portfolio_cost = portfolio_cost;
 	}
 
+	public Double getNetCapital_gain() {
+		return netCapital_gain;
+	}
+
+	public void setNetCapital_gain(Double netCapital_gain) {
+		this.netCapital_gain = netCapital_gain;
+	}
+
 	@Override
 	public String toString() {
 		return "PortfolioValue [portName=" + portName + ", portfolio_value=" + portfolio_value
 				+ ", change_from_last_day=" + change_from_last_day + ", cummulativeValue=" + cummulativeValue
-				+ ", changePortIndex=" + changePortIndex + ", source_date=" + source_date + ", delete_flag="
-				+ delete_flag + ", portfolio_cost=" + portfolio_cost + "]";
+				+ ", changePortIndex=" + changePortIndex + ", source_date=" + source_date + ", portfolio_cost="
+				+ portfolio_cost + ", netCapital_gain=" + netCapital_gain + "]";
 	}
 	
 	

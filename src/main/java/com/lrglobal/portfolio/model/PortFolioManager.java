@@ -215,7 +215,7 @@ public class PortFolioManager {
 	}
 
 	// calculating the cash weight value in the method
-	private double calculateShare(ArrayList<PortFolio> rslt) {
+	public double calculateShare(ArrayList<PortFolio> rslt) {
 		// TODO Auto-generated method stub
 		// double share_quantity=0;
 		double weighted_sum = 0;
@@ -237,7 +237,7 @@ public class PortFolioManager {
 		return weighted_sum;
 	}
 
-	private double calculate_commision(PortFolio portFolio) {
+	public double calculate_commision(PortFolio portFolio) {
 		// TODO Auto-generated method stub
 		double commision_value = 0;
 

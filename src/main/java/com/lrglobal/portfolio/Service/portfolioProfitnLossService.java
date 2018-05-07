@@ -47,6 +47,11 @@ public class portfolioProfitnLossService {
 			double total_gain = pfvm.calculateTotalGain(portName, end_date);
 			pfvm.exit();
 			
+			PortfolioValueManager pfvm2=new PortfolioValueManager();
+			pfvm2.setup();
+			double sum_OfCapitalgain=pfvm2.calculateSummationOfcapitalgain(portName, start_date, end_date);
+			pfvm2.exit();
+			
 			double current_profit=t_cashDividend+total_gain-t_commission;
 
 			PortfolioProfitnLoss pfpnl = new PortfolioProfitnLoss();
@@ -57,6 +62,7 @@ public class portfolioProfitnLossService {
 			pfpnl.setStart_date(start_date);
 			pfpnl.setEnd_date(end_date);
 			pfpnl.setCurrent_profit(current_profit);
+			pfpnl.setNetCapitalGain(sum_OfCapitalgain);
 			
 			Gson gson = new Gson();
 			return_string = gson.toJson(pfpnl);

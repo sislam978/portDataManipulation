@@ -15,6 +15,8 @@ public class PortfolioProfitnLoss {
 	public String end_date;
 	
 	public double current_profit;
+	
+	public double netCapitalGain;
 
 	public String getPortName() {
 		return portName;
@@ -73,11 +75,20 @@ public class PortfolioProfitnLoss {
 		this.current_profit = current_profit;
 	}
 
+	public double getNetCapitalGain() {
+		return netCapitalGain;
+	}
+
+	public void setNetCapitalGain(double netCapitalGain) {
+		this.netCapitalGain = netCapitalGain;
+	}
+
 	@Override
 	public String toString() {
 		return "PortfolioProfitnLoss [portName=" + portName + ", total_commission=" + total_commission
 				+ ", totalCashDividend=" + totalCashDividend + ", total_gain=" + total_gain + ", start_date="
-				+ start_date + ", end_date=" + end_date + ", current_profit=" + current_profit + "]";
+				+ start_date + ", end_date=" + end_date + ", current_profit=" + current_profit + ", netCapitalGain="
+				+ netCapitalGain + "]";
 	}
 	
 	
