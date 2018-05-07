@@ -412,5 +412,62 @@ public class PortFolioManager {
 		session.getTransaction().commit();
 		session.close();
 	}
+	
+	/*
+	 * total commission= (cost_price-commission)*quantity * commission
+	 * select all the data from portfolio table with provided range for certain portfolio name 
+	 * the loop through and in each loop calculate the commission and add it to the total commission 
+	 */
+	public double calculateTotalCommission(String portName, String start_date,String end_date){
+		
+		Session session=sessionFactory.openSession();
+		session.beginTransaction();
+		
+		double total_commission=0;
+		
+		String SQL_QUERY="select u from PortFolio u where u.portfoli_name='" + portName + "' and u.source_date>='"
+				+ start_date + "'and u.source_date<='"+end_date+"' and u.delete_flag<> 1 and u.CashDividendFlag is null";
+		
+		Query query=session.createQuery(SQL_QUERY);
+		ArrayList<PortFolio> rslt= (ArrayList<PortFolio>) query.getResultList();
+		for(int i=0;i<rslt.size();i++){
+			double cost_price=0;
+			if(rslt.get(i).getCommission()!=null){
+				cost_price=rslt.get(i).getCost_price()-rslt.get(i).getCommission();
+				double commission=cost_price*rslt.get(i).getNumber_of_share()*rslt.get(i).getCommission();
+				total_commission+=commission;
+			}
+			else{
+				total_commission+=0;
+			}
+		}
+		session.getTransaction().commit();
+		session.close();
+		return total_commission;
+	}
+	
+	public double calculateCashDividend(String portName, String start_date,String end_date){
+		
+		Session session=sessionFactory.openSession();
+		session.beginTransaction();
+		
+		double total_cashDividend=0;
+		String SQL_QUERY="select u from PortFolio u where u.portfoli_name='" + portName + "' and u.source_date>='"
+				+ start_date + "'and u.source_date<='"+end_date+"' and u.delete_flag<> 1 and u.CashDividendFlag is not null";
+		
+		Query query=session.createQuery(SQL_QUERY);
+		ArrayList<PortFolio> rslt= (ArrayList<PortFolio>) query.getResultList();
+		for(int i=0;i<rslt.size();i++){
+			if(rslt.get(i).getNumber_of_share()==null){
+				total_cashDividend+=0;
+			}
+			else{
+				total_cashDividend+=rslt.get(i).getNumber_of_share();
+			}
+		}
+		session.getTransaction().commit();
+		session.close();
+		return total_cashDividend;
+	}
 
 }

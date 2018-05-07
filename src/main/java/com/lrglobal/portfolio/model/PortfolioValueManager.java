@@ -71,14 +71,22 @@ public class PortfolioValueManager {
 
 			ArrayList<PortSummaryTable> rslt = (ArrayList<PortSummaryTable>) query.getResultList();
 			double portValue = 0;
+			/*
+			 * calculating portfolio cost from summary table records
+			 * equation summation of (portfolio_cost=quantity*cost_price)
+			 */
+			double portfolio_cost=0;
 			for (int i = 0; i < rslt.size(); i++) {
 				portValue += rslt.get(i).getPortfoli_value();
+				double costValue=rslt.get(i).getShare_quantity()*rslt.get(i).getCost_price();
+				portfolio_cost+=costValue;
 			}
 			PortfolioValue portfolioValue = new PortfolioValue();
 			portfolioValue.setPortName(rslt.get(0).getPort_name());
 			portfolioValue.setSource_date(rslt.get(0).getSource_date());
 			portfolioValue.setPortfolio_value(portValue);
 			portfolioValue.setDelete_flag(0);
+			portfolioValue.setPortfolio_cost(portfolio_cost);
 			session.save(portfolioValue);
 		}
 
@@ -305,6 +313,25 @@ public class PortfolioValueManager {
 			}
 			session.getTransaction().commit();
 			session.close();			
+		}
+		
+		public double calculateTotalGain(String portName, String d_date){
+			Session session=sessionFactory.openSession();
+			session.beginTransaction();
+			
+			double Total_Gain=0;
+			String SQL_QUERY="select u from PortfolioValue u where u.portName='" + portName + "' and u.source_date>='"
+					+ d_date + "' and u.delete_flag<>1";
+			Query query =session.createQuery(SQL_QUERY);
+			
+			ArrayList<PortfolioValue> rslt=(ArrayList<PortfolioValue>)query.getResultList();
+			if(rslt.size()>0){
+				Total_Gain=rslt.get(0).getPortfolio_value()-rslt.get(0).getPortfolio_cost();
+				
+			}
+			session.getTransaction().commit();
+			session.close();	
+			return Total_Gain;
 		}
 
 }

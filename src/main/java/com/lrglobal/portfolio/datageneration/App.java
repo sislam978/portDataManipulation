@@ -225,6 +225,21 @@ public class App
     			pfm.cashDividendCASHrow(portName, ticker, d_date);
     			pfm.exit();
     		}
+    		else if(command.equals("ddd")){
+    			System.out.println("Enter port Name:");
+    			String portName=input.nextLine();
+    			
+    			System.out.println("Enter start Name:");
+    			String star_date=input.nextLine();
+    			
+    			System.out.println("Enter end date:");
+    			String end_date=input.nextLine();
+    			
+    			PortFolioManager pfm=new PortFolioManager();
+    			pfm.setup();
+    			pfm.calculateTotalCommission(portName, star_date, end_date);
+    			pfm.exit();
+    		}
     	}
 //        TestTableManager testTableManager=new TestTableManager();
 //        testTableManager.setup();

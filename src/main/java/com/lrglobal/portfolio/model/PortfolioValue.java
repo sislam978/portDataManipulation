@@ -70,6 +70,9 @@ public class PortfolioValue {
 	
 	@Column(name="delete_flag")
 	private Integer delete_flag;
+	
+	@Column(name="portfolio_cost")
+	private Double portfolio_cost;
 
 	public long getPortvalueId() {
 		return portvalueId;
@@ -166,20 +169,22 @@ public class PortfolioValue {
 	public void setDelete_flag(Integer delete_flag) {
 		this.delete_flag = delete_flag;
 	}
+	
+
+	public Double getPortfolio_cost() {
+		return portfolio_cost;
+	}
+
+	public void setPortfolio_cost(Double portfolio_cost) {
+		this.portfolio_cost = portfolio_cost;
+	}
 
 	@Override
 	public String toString() {
-		return "PortfolioValue [portvalueId=" + portvalueId + ", portName=" + portName + ", portfolio_value="
-				+ portfolio_value + ", change_from_last_day=" + change_from_last_day + ", cummulativeValue="
-				+ cummulativeValue + ", changePortIndex=" + changePortIndex + ", source_date=" + source_date
-				+ ", created_by=" + created_by + ", created_on=" + created_on + ", deleted_by=" + deleted_by
-				+ ", deleted_on=" + deleted_on + ", getPortvalueId()=" + getPortvalueId() + ", getPortName()="
-				+ getPortName() + ", getPortfolio_value()=" + getPortfolio_value() + ", getChange_from_last_day()="
-				+ getChange_from_last_day() + ", getCummulativeValue()=" + getCummulativeValue()
-				+ ", getChangePortIndex()=" + getChangePortIndex() + ", getSource_date()=" + getSource_date()
-				+ ", getCreated_by()=" + getCreated_by() + ", getCreated_on()=" + getCreated_on() + ", getDeleted_by()="
-				+ getDeleted_by() + ", getDeleted_on()=" + getDeleted_on() + ", getClass()=" + getClass()
-				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
+		return "PortfolioValue [portName=" + portName + ", portfolio_value=" + portfolio_value
+				+ ", change_from_last_day=" + change_from_last_day + ", cummulativeValue=" + cummulativeValue
+				+ ", changePortIndex=" + changePortIndex + ", source_date=" + source_date + ", delete_flag="
+				+ delete_flag + ", portfolio_cost=" + portfolio_cost + "]";
 	}
 	
 	
