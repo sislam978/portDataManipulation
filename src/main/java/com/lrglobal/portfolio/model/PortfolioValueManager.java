@@ -229,6 +229,18 @@ public class PortfolioValueManager {
 		session.close();
 	}
 
+	/*
+	 * The method is for one of the portfolio Service to show the portfolio Value Data from the front end
+	 * After starting a session Create a query with portfolio name, and date range and checking the data which have 
+	 * deleted flag 0 
+	 * 1. From the resulted list check whether the portfolio index is less then 0 or not. Then assigned settled 
+	 * value of portfolio index to a variable  
+	 * 2 multiply the index value with a constant 1000 
+	 * 3. loop through the function to calculate portfolio change index using previous portfolio value.
+	 * 4. put each calculated value in Map<date, changeValue>
+	 * 5. The reason of multiplying the constant is to scaling the portfolio index to show the performance of a fund
+	 * over the date range.
+	 */
 	public Map<String, Double> getALlValueFOrChart(String portName, String startDate, String endDate) {
 		// TODO Auto-generated method stub
 
@@ -271,6 +283,12 @@ public class PortfolioValueManager {
 		session.close();
 		return rslt;
 	}
+	/*
+	 * Another Chart Service data provider method. 
+	 * query with portfolio table, and date range and save it to the rslt list.
+	 * then create a Map<date,portfolio value> 
+	 * return the map to the service method.
+	 */
 	public Map<String,Double> portValuesForChart(String portName, String start_date,String end_date){
 		
 		Session session = sessionFactory.openSession();
@@ -314,13 +332,18 @@ public class PortfolioValueManager {
 			session.getTransaction().commit();
 			session.close();			
 		}
-		
+		/*
+		 * Select a single record for a date of certain fund name.
+		 * from them using the equation of total gain= portfolio value-portfolio cost
+		 * return the value
+		 * Total gain is calculate to show the portfolio profit or loss in front end
+		 */
 		public double calculateTotalGain(String portName, String d_date){
 			Session session=sessionFactory.openSession();
 			session.beginTransaction();
 			
 			double Total_Gain=0;
-			String SQL_QUERY="select u from PortfolioValue u where u.portName='" + portName + "' and u.source_date>='"
+			String SQL_QUERY="select u from PortfolioValue u where u.portName='" + portName + "' and u.source_dates='"
 					+ d_date + "' and u.delete_flag<>1";
 			Query query =session.createQuery(SQL_QUERY);
 			
@@ -334,6 +357,14 @@ public class PortfolioValueManager {
 			return Total_Gain;
 		}
 
+		/*
+		 * Portfolio value table data update for certain portname on specific date. 
+		 * query the data using portfolio name and desired date
+		 * then call the capital gain manager class method calculate capital gain which will 
+		 * summation over a date range of certain portname all tickers capital gain and return a double value
+		 * set it to the net capital gain in portfolio value table column
+		 * update the record
+		 */
 		public void updateRowFor_CapitalGain(String portName, String d_date){
 			Session session=sessionFactory.openSession();
 			session.beginTransaction();
@@ -355,6 +386,13 @@ public class PortfolioValueManager {
 			session.close();
 		}
 		
+		/*
+		 * To show portfolio profit or loss in frontend we need to sum up all the capital gain values from portfolio value table
+		 * this sum up value will be the final net capital gain which will be called released capital gain. 
+		 * query with date range for certain portfolio name
+		 * sum up all the capital of selected records
+		 * return the summation value
+		 */
 		public double calculateSummationOfcapitalgain(String portName, String start_date,String end_date){
 			Session session=sessionFactory.openSession();
 			session.beginTransaction();

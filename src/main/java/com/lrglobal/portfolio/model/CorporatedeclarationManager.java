@@ -39,7 +39,11 @@ public class CorporatedeclarationManager {
     	
     	
     }
-    
+    /*
+     * Insertion method for corporate declaration table. 
+     * duplicate data cheking constraint whether there is any previous data match with the desired data to insert.
+     * if no data found in database table then the new record will be saved 
+     */
     public String insertCDT(CorporateDeclaration cdt){
     	Session session= sessionFactory.openSession();
     	session.beginTransaction();
@@ -62,7 +66,10 @@ public class CorporatedeclarationManager {
     	session.close();
     	return "Successfull";
     }
-    
+    /*
+     * The method will set price change adjustment  value in price table. please check the cashDividend setInpriceTable method
+     * with parameters two list data from corporate declaration and price table
+     */
     public void cashDividendAdjustment(String ticker,String d_date) throws ParseException{
     	Session session= sessionFactory.openSession();
     	session.beginTransaction();
@@ -86,7 +93,10 @@ public class CorporatedeclarationManager {
     	session.close();
     }
 
-
+/*
+ * A helping method for cash dividend adjustment method. 
+ * It would return a list of data mostly return a single data size list 
+ */
 	public  ArrayList<CorporateDeclaration> desiredRecords(String ticker,String d_date) throws ParseException {
 		// TODO Auto-generated method stub
 		Session session =sessionFactory.openSession();

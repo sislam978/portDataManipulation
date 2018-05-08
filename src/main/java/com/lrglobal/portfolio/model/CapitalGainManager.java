@@ -59,7 +59,12 @@ public class CapitalGainManager {
 			
 		}
     }
-    
+    /*
+     * Capital gain insertion in database 
+     * 1. select all the portfolio record for certain ticker with SELL sign because we are calculating capital based on SELL records
+     * 2. Call calculate capitalgain function 
+     * after calculating set all the attributes and save the object into database.
+     */
     public void insertCapitalgain(String portName,String d_date) throws ParseException{
     	Session session=sessionFactory.openSession();
     	session.beginTransaction();
@@ -85,6 +90,10 @@ public class CapitalGainManager {
     	session.getTransaction().commit();
     	session.close();
     }
+    /*
+     * 1. The calculation is Net Capital Gain= (Cost price * share Quantity)portfolio -(costprice(summaryTbale)* sharequantity (portfolio table))
+     * 2. Summary table record is selected from previous day 
+     */
     public double CalculateCapitalgain(String portName,String ticker, String d_date) throws ParseException{
     	
     	Session session=sessionFactory.openSession();
@@ -113,7 +122,10 @@ public class CapitalGainManager {
     	ArrayList<PortSummaryTable>rsltSummary=(ArrayList<PortSummaryTable>)summary_Query.getResultList();
     	
     	double net_capital_gain=0;
-    	
+    	/*
+    	 * CALCULATE THE WEIGHTES SUM OF sharequantity and cost price
+    	 * from there net capital gain would be calculated
+    	 */
     	if(!rsltPortFolio.isEmpty() && !rsltSummary.isEmpty()){
     		
     		PortFolioManager pfm=new PortFolioManager();
@@ -131,7 +143,10 @@ public class CapitalGainManager {
     	
     	return net_capital_gain;
     }
-    
+    /*
+     * To show Portfolio profit or loss the method will calculate the net capital gain from capital gain table.
+     * 2. query in capital gain table and  from return data sum up the capital gain for a portfoli on certain date
+     */
     public double calculateNetCapitalGain(String portName, String d_date){
     	Session session=sessionFactory.openSession();
     	session.beginTransaction();

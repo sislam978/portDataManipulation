@@ -337,6 +337,11 @@ public class PortFolioManager {
 		return rslt.get(0).getSource_date();
 	}
 
+	/*
+	 * Helping method of portfolio table data showing service method which will return all the data 
+	 * from certain date for a fund. 
+	 * Here We check manual insertion of CASH row. We discard those row which have created_by is 1.
+	 */
 	public ArrayList<PortFolio> sendDesiredDateData(String portName, String desired_date) {
 
 		Session session = sessionFactory.openSession();
@@ -364,6 +369,14 @@ public class PortFolioManager {
 		return vv_rslt;
 	}
 
+	/*
+	 * 1.CASH row generate for cash dividend
+	 * 2.from the corporate declaration table we got the record for certain ticker in certain date
+	 * 3.Take in cosideration of data prof previous day summary table record
+	 * 4.Calculate cash quantity by using CASH= quantity * cash dividend
+	 * 5. check whether there is any previous records for the fund on taht date as CAS row. 
+	 * 6. If not then save it into the portfolio Table.
+	 */
 	public void cashDividendCASHrow(String portName, String ticker, String d_date) throws ParseException {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -446,6 +459,12 @@ public class PortFolioManager {
 		return total_commission;
 	}
 	
+	/*
+	 * Total cash dividend calculation for portfolio profit or loss show in front end
+	 * 1. select all the data from portfolio table. which will not considering CASH ticker.
+	 * 2. from this if the recordhave any share quantity it would be sum up
+	 * 3. Only those records are considered which have enabled cash dividend flag
+	 */
 	public double calculateCashDividend(String portName, String start_date,String end_date){
 		
 		Session session=sessionFactory.openSession();

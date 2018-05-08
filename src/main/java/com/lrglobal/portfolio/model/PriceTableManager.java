@@ -41,7 +41,10 @@ public class PriceTableManager {
 		sessionFactory.close();
 
 	}
-
+/*
+ * Insert data from CSV 
+ * read CSV file according to defined structure. save the read data into price table    
+ */
 	public void Insert(String fileNameDefined) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -61,6 +64,14 @@ public class PriceTableManager {
 		session.getTransaction().commit();
 		session.close();
 	}
+	/*
+	 * Calculate the price change from the price table method. 
+	 * 1. first find out the records ticker wise from price table
+	 * 2. for each ticker select data for all the dates and using the equation 
+	 * price change = current price/ previous price calculate the price change
+	 * 3. set the price change and update the records
+	 * 4.initial day price change will need to set 0
+	 */
 	public void updateRowPriceChange(){
 		Session session=sessionFactory.openSession();
 		session.beginTransaction();
@@ -98,6 +109,10 @@ public class PriceTableManager {
 		session.close();
 	}
 
+	/*
+	 * The method is providing the data for cash dividend adjustment in price table 
+	 * simple query with portfolio name and desired date. it will return single size list
+	 */
 	public ArrayList<PriceTable> getRecordsPT(String ticker,String d_date) {
 		// code to get a Data
 		Session session = sessionFactory.openSession();
@@ -157,6 +172,11 @@ public class PriceTableManager {
 //		return rslt;
 //	}
 
+	/*
+	 * Cash dividend adjustment from corporate declaration table to set price change again
+	 * 1. from the result list We will calculate the new price change= (current price + cash dividend)/previous price
+	 * 2. set the new price change in price change column then update the record
+	 */
 	public void cashdividendSetInPriceChange(ArrayList<CorporateDeclaration> rsltCD, ArrayList<PriceTable> rsltpt)
 			throws ParseException {
 		// TODO Auto-generated method stub
