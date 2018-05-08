@@ -52,7 +52,7 @@ public class portfolioProfitnLossService {
 			double sum_OfCapitalgain=pfvm2.calculateSummationOfcapitalgain(portName, start_date, end_date);
 			pfvm2.exit();
 			
-			double current_profit=t_cashDividend+total_gain-t_commission;
+			double current_profit=t_cashDividend+total_gain-t_commission+sum_OfCapitalgain;
 
 			PortfolioProfitnLoss pfpnl = new PortfolioProfitnLoss();
 			pfpnl.setPortName(portName);
